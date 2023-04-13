@@ -1,0 +1,543 @@
+---
+title: "Football 2018-2021 Game-by-Game Report"
+author: "Zachary Lazerick"
+date: 'June 21, 2021'
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(warnings = FALSE, messages = FALSE)
+```
+
+**Introduction**
+
+In this document, we will be investigating the last four football seasons (2018-2021) to see if there is a way to predict whether a given game is a conference game, or not, as well as examine correlations and associations to predict the total ticket revenue for each game based on a variety of factors. The data collected for this data is as follows: Opponent, Conference Game, Location, Occasion, Weather, Temperature, Attendance, Game Date, Season, Group Tickets, Group Revenue, Single Game Tickets Sold, Single Game Ticket Revenue, Total Tickets Sold, Total Ticket Revenue, Total Tickets Out, Season Ticket Revenue, Percent Tickets Sold, Percent Season Revenue, Percent New Revenue. A brief description of each variable is provided below:
+
+Opponent -- The Opposing Team of a Game
+
+Conference Game -- Yes or No. Is the Opposing Team a Member of the Patriot League? If Yes, then Conference Game = Yes. 
+
+Location -- Fitton Field is the Home Stadium of the Holy Cross Crusaders. 
+
+Occasion -- Was there a Certain Holiday or Event happening the same Weekend as the Game? Home = No event, Home-Opener = First Home Game of the Season, Homecoming = Home Game during Homecoming Weekend, Family Weekend = Home Game during Family Weekend, Senior Day = Last Home Game of the Season.
+
+Weather -- Weather at Kickoff
+
+Temperature -- Temperature at Kickoff (in $^{\circ}F$)
+
+Attendance -- Reported Attendance of the Game as listed on the Box Score. (This does not have to equal Total Tickets Sold, or Total Tickets Out)
+
+Game Date -- Date of the Game (mm/dd/yyyy)
+
+Season -- Athletic Season of Game
+
+Group Tickets -- Number of Group Tickets Sold for a Game
+
+Group Ticket Revenue -- The Revenue earned from the Group Tickets Sold ($)
+
+Single Game Tickets Sold -- Number of Single Game Tickets Sold for a Game. This does include Promotional and Discounted Tickets but does not include Season Tickets.
+
+Single Game Ticket Revenue -- The Revenue earned from the Single Game Tickets Sold. ($)
+
+Total Tickets Sold -- Number of Total Tickets Sold for a Game. Calculated as Number of Group Tickets + Number of Single Game Tickets + Number of Season Tickets Sold. 
+
+Total Ticket Revenue -- The Revenue earned from all the Tickets Sold. ($)
+
+Total Tickets Out -- Number of Total Tickets made available to the public for a given game. Calculated as Number of Total Tickets Sold + Number of Comp Tickets. 
+
+Season Ticket Revenue -- The Revenue earned from all Season Tickets Sold. ($)
+
+Percent Tickets Sold -- The percentage of tickets available to the public that earned Revenue. Calculated as Total Tickets Sold / Total Tickets Out. 
+
+Percent Season Revenue -- Percentage of Total Revenue that is from Season Tickets. Calculated as Season Ticket Revenue / Total Ticket Revenue. 
+
+Percent New Revenue --Percentage of Total Revenue that is not from Season Tickets. Percentage of Total Revenue from Single-Game Purchases and Group Tickets. Calculated as 1 - Percent Season Revenue.
+
+For our Investigation, we are examining only home games because those are games in which we sell tickets and earn revenue for. Also, we are examining only the last four athletic seasons because this data is most accurate, as well as co-insides with the hiring of our latest football Head Coach, Bob Chesney. Due to the COVID-19 pandemic, the games from the 2020 season are not considered because attendance was not allowed. Including these games would produce a significant skew in the data. Also, we are not including the Polar Park Game from this past Season in our study because the variables we are interested in our not available. All data was obtained from official NCAA box scores of each game, as well as Event Audits. Accuracy of this data is subject to the accuracy of these sources.  
+
+
+```{r, include = F}
+FBGBG <- read.csv("2018_2022FBGamebyGame.csv")
+FBGBG <- FBGBG[-c(4), ] ##Deletes the Polar Park Game from Data Set
+FBGBG <- subset(FBGBG, select = -c(18:24)) ##Deletes Additional Revenue Source Sales Data
+attach(FBGBG)
+
+PercentTicketsSold <- TotalTicketsSold / TotalTicketsOut
+PercentSeasonRevenue <- SeasonTicketRevenue / TotalTicketRevenue
+PercentNewRevenue <- 1 - PercentSeasonRevenue
+AtdInflation = Attendance / TotalTicketsOut
+
+FBGBG <- data.frame(FBGBG, PercentTicketsSold, PercentSeasonRevenue,
+                    PercentNewRevenue, AtdInflation)
+
+attach(FBGBG)
+
+##Recode Variables to use in Data Visualization and Analysis
+FBGBG$ConferenceGame <- as.factor(FBGBG$ConferenceGame)
+FBGBG$Occasion <- as.factor(FBGBG$Occasion)
+FBGBG$Weather <- as.factor(FBGBG$Weather)
+```
+
+
+\pagebreak
+
+**Data Visualization**
+
+```{r, echo = F}
+##Boxplot Analysis of Total Ticket Revenue for Conference and Non-Conference Games
+
+##Boxplot
+boxplotTTRCG <- boxplot(TotalTicketRevenue ~ ConferenceGame, data = FBGBG, 
+        xlab = "Conference Game", ylab = "Total Revenue From Ticket Sales", 
+        main = "Total Ticket Revenue for Conference and Non-Conference Games")
+
+##Boxplot Summary Statistics
+TTRCG.stats <- boxplotTTRCG$stats
+##Change Names of Rows and Columns for Easy Interpretability
+colnames(TTRCG.stats) <- c("No", "Yes")
+rownames(TTRCG.stats) <- c("Minimum", "First Quartile", "Median", "Third Quartile", "Maximum")
+##Output the Summary Statistics
+TTRCG.stats
+
+##Boxplot Confidence Intervals
+TTRCG.conf <- boxplotTTRCG$conf
+##Change Names of Rows and Columns for Easy Interpretability
+colnames(TTRCG.conf) <- c("No", "Yes")
+rownames(TTRCG.conf) <- c("Lower Bound", "Upper Bound")
+##Output the Confidence Intervals
+TTRCG.conf
+```
+
+Conference Games tend to earn less than their non-Conference counterparts, save for one outlier game. In fact, almost half of the non-Conference Games earned more revenue than any of the Conference Games. However, this comes with a trade-off. Non-Conference Game revenue is more variable and spread out than Conference Games. $95%$ of Non-Conference Games are expected to earn between $11847.82-35828.18$ dollars while $95%$ of Conference Games are expected to earn between $15685.92-24581.58$ dollars. 
+
+\pagebreak
+```{r, echo = F}
+##Boxplot Analysis of Total Ticket Revenue per Season
+
+##Boxplot
+boxplotTTRS <- boxplot(TotalTicketRevenue ~ Season, data = FBGBG, 
+        xlab = "Season", ylab = "Total Ticket Revenue From Ticket Sales", 
+        main = "Total Ticket Revenue per Season")
+##Boxplot Summary Statistics
+TTRS.stats <- boxplotTTRS$stats
+##Change Names of Rows and Columns for Easy Interpretability
+colnames(TTRS.stats) <- c("2018", "2019", "2021")
+rownames(TTRS.stats) <- c("Minimum", "First Quartile", "Median", "Third Quartile", "Maximum")
+##Output Summary Statistics
+TTRS.stats
+
+##Boxplot Confidence Intervals
+TTRS.conf <- boxplotTTRS$conf
+##Change Names of Rows and Columns for Easy Interpretability
+colnames(TTRS.conf) <- c("2018", "2019", "2021")
+rownames(TTRS.conf) <- c("Lower Bound", "Upper Bound")
+##Output Confidence Intervals
+TTRS.conf
+```
+
+For the past three seasons with fan attendance, the median income increased by $126%$ from the 2018 Season to the 2019 Season and then decreased by $123%$ from the 2019 Season to the 2021 Season. Overall, this is a $102%$ increase in median income over the past four seasons. Although one would expect a more substantial increase after winning three back-to-back Patriot League Championships, the effects of the COVID-19 pandemic and still rippling through society, including on the Holy Cross Campus. With the risk of contracting the virus, less people are willing to attend large public gatherings, and periodic outbreaks of the virus on campus also certainly contributed to the dip in revenue this past season.
+
+\pagebreak
+```{r, echo = F}
+##Boxplot Analysis of Percent Tickets Sold per Season
+
+##Boxplot
+boxplotPTSS <- boxplot(PercentTicketsSold ~ Season, data = FBGBG, 
+                       xlab = "Season", ylab = "Percent Tickets Sold", 
+                       main = "Percent Tickets Sold per Season")
+
+##Summary Statistics
+PTSS.stats <- boxplotPTSS$stats
+colnames(PTSS.stats) <- c("2018", "2019", "2021")
+rownames(PTSS.stats) <- c("Minimum", "First Quartile", "Median", "Third Quartile", "Maximum")
+PTSS.stats
+
+##Confidence Intervals
+PTSS.conf <- boxplotPTSS$conf
+colnames(PTSS.conf) <- c("2018", "2019", "2021")
+rownames(PTSS.conf) <- c("Lower Bound", "Upper Bound")
+PTSS.conf
+```
+
+The median Percent Tickets Sold has decreased season after season. From the 2018 Season to the 2019 Season, this metric decreased by $104%$, and from the 2019 to the 2021 Season, it decreased by $228%$. This is a net decrease of $238%$ from the 2018 Season to the 2021 Season. The discrepancies in this plot can largely be explained by the College Athletic Department's decision to distribute a complimentary ticket to every student for all home games for the 2021 Season. This resulted in 3114 new complimentary tickets for each home football game, which effectively doubled the Total number of Tickets Out for every game. So, it makes sense that the figures dropped by around $200%$. 
+
+\pagebreak
+```{r, echo = F}
+##Boxplot Analysis of Percent New Revenue for Conference and Non-Conference Games
+boxplotPNRCG <- boxplot(PercentNewRevenue ~ ConferenceGame, data = FBGBG, 
+                        xlab = "Conference Game", ylab = "Percent New Revenue", 
+                        main = "Percent New Revenue for Conference and Non-Conference Games")
+
+##Summary Statistics
+PNRCG.stats <- boxplotPNRCG$stats
+colnames(PNRCG.stats) <- c("No", "Yes")
+rownames(PNRCG.stats) <- c("Minimum", "First Quartile", "Median", "Third Quartile", "Maximum")
+PNRCG.stats
+
+##Confidence Intervals
+PNRCG.conf <- boxplotPNRCG$conf
+colnames(PNRCG.conf) <- c("No", "Yes")
+rownames(PNRCG.conf) <- c("Lower Bound", "Upper Bound")
+PNRCG.conf
+```
+
+The median Percent New Revenue for Non-Conference Games tend to be greater than their Conference Game counterparts. In fact, the percent New Revenue for Non-Conference Games is greater than $50%$ of Conference Games, and the median Percent New Revenue decreases by $124%$. Due to the nature of the Patriot League, Non-Conference Games tend to feature more local opponents, than Conference Games. Thus, one possible explanation is fans of visiting teams. These types of fans are only coming to the game to watch the visiting team. Hence, they only need to buy a Single-Game Ticket for that game, not season tickets. Another possible explanation are group tickets. Like visiting fans, group ticket buyers generally only buy tickets for a single game, and hence are treated as a new source of revenue outside the general season ticket market. 
+
+\pagebreak
+```{r, echo = F}
+##Boxplot Analysis of Percent New Revenue per Season
+boxplotPNRS <- boxplot(PercentNewRevenue ~ Season, data = FBGBG, 
+                       xlab = "Season", ylab = "Percent New Revenue", 
+                       main = "Percent New Revenue per Season")
+
+##Summary Statistics
+PNRS.stats <- boxplotPNRS$stats
+colnames(PNRS.stats) <- c("2018", "2019", "2021")
+rownames(PNRS.stats) <- c("Minimum", "First Quartile", "Median", "Third Quartile", "Maximum")
+PNRS.stats
+
+##Confidence Intervals
+PNRS.conf <- boxplotPNRS$conf
+colnames(PNRS.conf) <- c("2018", "2019", "2021")
+rownames(PNRS.conf) <- c("Lower Bound", "Upper Bound")
+PNRS.conf
+```
+
+This plot features many of the same observations from our plot of Percent Tickets Sold per Season and Total Ticket Revenue per Season. the 2018 Season featured the least varied Percent New Revenue, while the 2019 and 2021 Seasons featured similar variations. However, the median of Percent New Revenue for the 2021 Season dropped off significantly compared to that of the 2018 and 2019 Seasons. Again, this drop off can be attributed to the COVID-19 Pandemic, with less people wanting to travel to protect themselves from the virus, there were less chances to generate new revenue outside the usual season ticket market. But, season ticket revenue has steadily increased in the past four years. However, with the 2021 Season, there is a significant jump in Season Ticket Revenue per Game than previous years. Season Ticket Revenue net-increased by $191%$ from 2018 in 2021 and by $162%$ from 2019 to 2021.
+
+\pagebreak
+**Simple Linear Models to Investigate Relationships with Total Ticket Revenue**
+
+```{r}
+##Attendance vs. Total Ticket Revenue
+plot(Attendance, TotalTicketRevenue, type = "p", 
+     xlab = "Attendance", ylab = "TotalTicketRevenue ($)")
+lm.fit.TRevenue <- lm(TotalTicketRevenue ~ Attendance, data = FBGBG)
+abline(lm.fit.TRevenue, col = "green", lwd = 2)
+abline(h = mean(TotalTicketRevenue), v = mean(Attendance), col = "blue", lwd = 1)
+```
+
+From this plot we can see the relationship between the reported attendance and total ticket revenue. The blue lines are the means of each parameter. The horizontal being the average Total Ticket Revenue, and the vertical being the average Attendance. The green line is a rough, linear approximation of the relationship. Obviously, the greater the attendance, one would expect the greater the total ticket revenue. Hence, we see a positive, roughly proportional relationship. 
+
+However, we see that not many observations lie on our line of best fit. There are games earning the same amount of total revenue, with many more attendees. How can this be possible? One answer is people buy the tickets, but do not show up for some games as opposed to others. Thus, these tickets contribute to the Total Ticket Revenue, but do not contribute to the game's Attendance. If this were the case, we would expect the number of Total Tickets Sold to exceed that of Attendance.
+
+\pagebreak
+So, here is a plot of that:
+
+```{r}
+##Attendance vs. Total Tickets Sold
+plot(Attendance, TotalTicketsSold, type = "p", 
+     xlab = "Attendance", ylab = "Total Tickets Sold")
+lm.fit.TRevenue6 <- lm(TotalTicketsSold ~ Attendance, data = FBGBG)
+abline(lm.fit.TRevenue6, col = "green", lwd = 2)
+abline(h = mean(TotalTicketsSold), v = mean(Attendance), col = "blue", lwd = 1)
+```
+
+As before, the blue lines represent the means of each parameter, where the horizontal is the average Total Tickets Sold, and the vertical is the average Attendance, while the green line represents an approximate linear relationship. At first glance, it appears very similar to that of the previous plot. However, calculating the proportion of games where Total Tickets Sold exceed that of Attendance we get:
+
+```{r}
+mean(TotalTicketsSold >= Attendance)
+```
+
+which corresponds to 1 game, where there were more tickets sold than people attended. So, this cannot be the explanation. A second explanation could be an overwhelming majority of complimentary (comp) tickets making up most of the game attendance. By nature, comp tickets are awarded for no charge, so people can attend the game for free, and we are not earning any revenue from these tickets. Now since our Total Tickets Out data corresponds to the amount of tickets sold plus the number of comp tickets, we should expect the amount of Total Tickets Out should be roughly equal to the game attendance. 
+
+\pagebreak
+So, here is a plot of that:
+
+```{r}
+##Attendance vs. Total Tickets Out
+plot(Attendance, TotalTicketsOut, type = "p", 
+     xlab = "Attendance", ylab = "Total Tickets Out")
+lm.fit.TRevenue5 <- lm(TotalTicketsOut ~ Attendance, data = FBGBG)
+abline(lm.fit.TRevenue5, col = "green", lwd = 2)
+abline(h = mean(TotalTicketsOut), v = mean(Attendance), col = "blue", lwd = 1)
+```
+
+As before, the blue lines represent the means of each parameter, where the horizontal line is the average Total Tickets Out, and the vertical line is the average Attendance, and the green line is a rough linear approximation of the relationship. Now, this plot does not look very similar to the last two plots. No single data point lies on the line of best fit. Thus, not only is the linear relationship weaker, but the points are also randomly scattered. So, this cannot be the explanation either. In fact, there are many games where the reported Attendance is greater than the Total Tickets Out. Calculating the proportion of games where attendance exceeds the number of Total Tickets Out, we get:
+
+```{r}
+mean(Attendance >= TotalTicketsOut)
+```
+
+which corresponds to 12 games where the reported Attendance was greater than the number of Total Tickets Out. This can only mean that the reported Attendance on the final game box score, is over-reported, and inflated. In fact, Attendance is over-reported by a factor of 
+
+```{r}
+mean(AtdInflation)
+```
+
+\pagebreak
+A breakdown of this statistic by season is provided below:
+
+```{r}
+boxplotINFS <- boxplot(AtdInflation ~ Season, data = FBGBG, 
+                       xlab = "Season", ylab = "Attendance Over-Reported by", 
+                       main = "Attendance Inflation per Season")
+INFS.stats <- boxplotINFS$stats
+colnames(INFS.stats) <- c("2018", "2019", "2021")
+rownames(INFS.stats) <- c("Minimum", "First Quartile", "Median", "Third Quartile", "Maximum")
+INFS.stats
+
+INFS.conf <- boxplotINFS$conf
+colnames(INFS.conf) <- c("2018", "2019", "2021")
+rownames(INFS.conf) <- c("Lower Bound", "Upper Bound")
+INFS.conf
+```
+
+Therefore, Game Attendance reporting is unreliable and inadequate to be used as a parameter as it stands now. This should be cross-referenced with other measures like Total number of Tickets Scanned per Gate for events in the future in order for more accurate reporting of Revenue and other statistics.
+
+
+\pagebreak
+```{r}
+##Percent Tickets Sold vs. Total Ticket Revenue
+plot(PercentTicketsSold, TotalTicketRevenue, type = "p", 
+     xlab = "Percent Tickets Sold", ylab = "Total Ticket Revenue")
+lm.fit.TRevenue2 <- lm(TotalTicketRevenue ~ PercentTicketsSold, data = FBGBG)
+abline(lm.fit.TRevenue2, col = "red", lwd = 2)
+abline(h = mean(TotalTicketsSold), v = mean(PercentTicketsSold), col = "blue" , lwd = "1")
+```
+
+From this plot, we can see the relationship between the Percent of Tickets Sold, and the Total Ticket Revenue. The blue lines represent the means of the two parameters. The Horizontal line is the average Total Ticket Revenue, and the Vertical line is the average Percent of Tickets Sold. The Red line indicates a rough linear approximation of the relationship between these two parameters. Percent Tickets Sold is an indicator of what proportion of tickets out earn revenue.
+One would expect that the greater the number of tickets earn revenue, the more revenue is generated. With a positive, proportional relationship as outlined by the linear approximation, the data supports this claim.
+
+However, there are anomalies. There is one point where the Percent of Tickets Sold is less than average, but the Total Ticket Revenue is greater than average. This data point corresponds to the Harvard vs. Holy Cross game from the 2021 season. This game had one of the greatest amounts of Single Game Tickets Sold, beat only by the Harvard vs. Holy Cross game from the 2019 season. But this game also had the greatest amount of Total Tickets Out, which can explain why the Percent Tickets Sold is less than expected for what was a great turnout of a game. In fact, the three highest grossing games from the past four seasons all came during that season's Homecoming Weekend, where two of those games were played against Harvard. **Therefore, going forward, Homecoming weekend should be a priority for generating extra ticket sales and revenue.**
+
+\pagebreak
+On the opposite side of the graph, there are many more points where the Percent of Tickets Sold is greater than average, but the Total Ticket Revenue is less than average. This means that of the Tickets being put Out for the Public, the majority of them are selling, which is good, but those sales are not generating the same amount of revenue as to be expected. All of the games in this area are from the 2018 or 2019 season. This phenomenon can be explained by the College's recent change of policy to let all students get into the game for free for the 2021 season. This gives all students a comp ticket, increasing the amount of tickets out into the environment, but decreasing the percentage of those tickets generating revenue. This change is affecting the mean for the percent of tickets sold, and decreasing it. So, games from earlier seasons where this policy was not in place are seeing disproportionate results. **However, this is a good change, because with students able to attend games at their own leisure, increasing athletic visibility, and potentially increasing the amount of attendees in the future, if parents or relatives or friends would like to attend the games with their students, and therefore increasing sales.**
+
+\pagebreak
+```{r}
+##Total Tickets Sold vs. Total Ticket Revenue
+##Significant
+plot(TotalTicketsSold, TotalTicketRevenue, type = "p", 
+     xlab = "Total Tickets Sold", ylab = "Total Ticket Revenue ($)")
+lm.fit.TRevenue3 <- lm(TotalTicketRevenue ~ TotalTicketsSold, data = FBGBG)
+abline(reg = lm.fit.TRevenue3, col = "green", lwd = 2)
+abline(v = mean(TotalTicketsSold), h = mean(TotalTicketRevenue), col = "blue", lwd = 1)
+```
+
+From this plot, we can see the relationship between the total number of tickets sold, and the total revenue from tickets. The blue lines represent the means of the two parameters. The horizontal line is the average Total Ticket Revenue, and the Vertical is the average Total Tickets Sold. The green line is rough, linear approximation of the relationship. Obviously, the more tickets sold, the more revenue earned, hence a directly proportional relationship, and therefore, the linear model is a great fit for the data. 
+
+But what is interesting is that there are no anomalies where the reported revenue greatly exceeds the number of tickets sold, or where the reported Total Ticket Revenue is greater than the average Total Ticket Revenue, but the reported Total Tickets Sold is less than the average Total Tickets Sold. This means that prices between seasons and games are fairly consistent. There are no games where ticket prices appear to have been inflated. 
+
+However, there is one observation that is an anomaly in the opposite way. That is, the reported Total Ticket Revenue is less than the average Total Ticket Revenue, but the number of Total Tickets Sold is greater than the average Total Tickets Sold. Looking through the data, this game is Lehigh vs Holy Cross from the 2018 season. So what went wrong? This game is the only one on record where it was raining at kickoff, but also this game was held during family weekend. Family weekend attracts many parents and relatives of students from all over. So, one possible reason, for this discrepancy between tickets sold and Total Ticket Revenue is that there was a promotional Ticket Offer where attendees could purchase a bulk amount of tickets at a discounted rate, compared to the usual single game ticket rate. In fact this is what appeared to have happened. This game sold $1469$ single game tickets, earning $13944$ dollars. However, the previous home game, Bucknell vs. Holy Cross from the 2018 season only sold $859$ single game tickets earning $14901$ dollars. However, there could be other factors at play. This Lehigh vs Holy Cross is in fact the worst attended home game from our entire data set, and its not even close. Although, as explained previously, attendance is not a great metric for this data set and should be cross referenced with Total Tickets Scanned at all gates for games. 
+
+\pagebreak
+
+**Multi-linear Regression Model to Predict Total Ticket Revenue**
+
+Now, from our simple linear models, we have identified variables that have some underlying correlation with the Total Ticket Revenue for a given home football game. Next, we are going to combine those models, and see if the results and conclusions hold up when all parameters are contained in a single model.
+
+First we will investigate the full model with all chosen parameters we are interested in. This model will contain Total Ticket Revenue as a response variable, and then Weather, Temperature, Occasion, TotalTicketsOut as predictors. We will then investigate reductions of this model to see if we obtain better predicting accuracy and interpretability with simpler models.
+
+\pagebreak
+
+**Logistic Regression Models to Investigate Relationships with Conference Games**
+
+
+The Akaike Information Criterion (AIC) is an estimator of prediction error, and therefore, quality of a statistical model. AIC is a number ranging from 0 to $\infty$. The smaller the AIC, the less prediction error, and therefore, better quality of a statistical model, relative to other models. After testing a number of models, the top five best single-predictor models with their respective AICs are listed below. From here, the top three best single-predictor models were selected to examine multiple predictor models. All combinations of these predictors with their respective AICs are also listed below. 
+
+| Model |                    Predictors                   |    AIC   |
+|:-----:|:-----------------------------------------------:|:--------:|
+|   I   |                Total Tickets Sold               | 22.25139 |
+|   II  |                Total Tickets Out                | 22.17879 |
+|  III  |               Total Ticket Revenue              |  21.9872 |
+|   IV  |                   Temperature                   | 16.82625 |
+|   V   |                    Attendance                   |  18.8349 |
+|   VI  |             Temperature + Attendance            | 15.80427 |
+|  VII  |        Temperature + Total Ticket Revenue       | 17.96059 |
+|  VIII |        Attendance + Total Ticket Revenue        | 19.06304 |
+|   IX  | Temperature + Attendance + Total Ticket Revenue | 16.45118 |
+
+From this table, we see that the models with the three smallest AICs, are Conference Game ~ Temperature + Attendance, Conference Game ~ Temperature + Attendance + Total Ticket Revenue, and Conference Game ~ Temperature. This means that these three models have the smallest information loss, and thus are the three "best" models for predicting whether a given football game is a conference game or not. Therefore, Temperature at Game Time, Attendance, and Total Ticket Revenue are the most useful in determining whether a given game is a conference game or not, compared to the rest of the variables in our data set. This means that there is an underlying association between these three predictors and our response variable. 
+
+
+\pagebreak
+
+**Conference Game Predictions**
+
+In this sections, we are predicting whether a given game is going to be a conference game or not using our results from the AIC in the above table. There are 3 different models we will be examining:
+
+  Model I -- Conference Game ~ Temperature
+  
+  Model II -- Conference Game ~ Temperature + Attendance
+  
+  Model III -- Conference Game ~ Temperature + Attendance + Total Ticket Revenue
+  
+There will be three separate tests in which we will examine the predictive power of each model. This will be measured by averaging the proportion of correct predictions across the three tests.
+
+```{r, include = F}
+##Test 1
+##Set Seed for Repeatability
+set.seed(1)
+
+##Split Data into a Training Set and a Test Set
+  ##Test Set is everything that is not the Training Set
+train <- sample(1:nrow(FBGBG), (nrow(FBGBG)/2))
+FBTest <- FBGBG[-train, ]
+
+##Store the True Values of Conference Game for the Test Set
+ConferenceGameTest <- ConferenceGame[-train]
+         
+##Model 1
+glm.fit.FBGBG1 <- glm(ConferenceGame ~ Temperature, 
+                     data = FBGBG, family = binomial)
+
+##Model 1 Posterior Probability of being a Conference Game
+glm.probs.FBGBG1 <- predict(glm.fit.FBGBG1, FBTest, type = "response")
+
+
+##Model 1 Conference Game Prediction 
+  ##If the Posterior Probability is Greater than .5, Conference Game = "Yes"
+FB.pred1 <- rep("No", (nrow(FBGBG)/2))
+FB.pred1[glm.probs.FBGBG1 > .5] <- "Yes"
+
+##Model 1 Predicted Conference Game vs. True Conference Game
+table(FB.pred1, ConferenceGameTest)
+
+##Model 1 Total Percentage of Correct Predictions
+mean(FB.pred1 == ConferenceGameTest)
+
+##Model 2
+glm.fit.FBGBG2 <- glm(ConferenceGame ~ Temperature + Attendance, 
+                      data = FBGBG, family = binomial)
+
+##Model 2 Posterior Probability of being a Conference Game
+glm.probs.FBGBG2 <- predict(glm.fit.FBGBG2, FBTest, type = "response")
+
+##Model 2 Conference Game Prediction
+  ##If the Posterior Probability is Greater than .5, Conference Game = "Yes" 
+FB.pred2 <- rep("No", (nrow(FBGBG)/2))
+FB.pred2[glm.probs.FBGBG2 > .5] <- "Yes"
+
+##Model 2 Predicted Conference Game vs. True COnference Game
+table(FB.pred2, ConferenceGameTest)
+
+##Model 2 Total Percentage of Correct Predictions
+mean(FB.pred2 == ConferenceGameTest)
+
+##Model 3 
+glm.fit.FBGBG3 <- glm(ConferenceGame ~ Temperature + Attendance + TotalTicketRevenue, 
+                      data = FBGBG, family = binomial)
+
+##Model 3 Posterior Probability of being a Conference Game
+glm.probs.FBGBG3 <- predict(glm.fit.FBGBG3, FBTest, type = "response")
+
+##Model 3 Conference Game Predictions
+  ##If the Posterior Probability is Greater than .5, Conference Game = "Yes"
+FB.pred3 <- rep("No", (nrow(FBGBG)/2))
+FB.pred3[glm.probs.FBGBG3 > .5] <- "Yes"
+
+##Model 3 Predicted Conference Games vs. True Conference Games
+table(FB.pred3, ConferenceGameTest)
+
+##Model 3 Total Percentage of Correct Predictions
+mean(FB.pred3 == ConferenceGameTest)
+```
+
+```{r, include = F}
+##Test 2
+set.seed(4)
+
+train <- sample(1:nrow(FBGBG), (nrow(FBGBG)/2))
+FBTest <- FBGBG[-train, ]
+
+ConferenceGameTest <- ConferenceGame[-train]
+
+##Model 1
+glm.fit.FBGBG1 <- glm(ConferenceGame ~ Temperature, 
+                      data = FBGBG, family = binomial)
+
+glm.probs.FBGBG1 <- predict(glm.fit.FBGBG1, FBTest, type = "response")
+
+FB.pred1 <- rep("No", (nrow(FBGBG)/2))
+FB.pred1[glm.probs.FBGBG1 > .5] <- "Yes"
+
+table(FB.pred1, ConferenceGameTest)
+mean(FB.pred1 == ConferenceGameTest)
+
+##Model 2
+glm.fit.FBGBG2 <- glm(ConferenceGame ~ Temperature + Attendance, 
+                      data = FBGBG, family = binomial)
+
+glm.probs.FBGBG2 <- predict(glm.fit.FBGBG2, FBTest, type = "response")
+
+FB.pred2 <- rep("No", (nrow(FBGBG)/2))
+FB.pred2[glm.probs.FBGBG2 > .5] <- "Yes"
+
+table(FB.pred2, ConferenceGameTest)
+mean(FB.pred2 == ConferenceGameTest)
+
+##Model 3
+glm.fit.FBGBG3 <- glm(ConferenceGame ~ Temperature + Attendance + TotalTicketRevenue, 
+                      data = FBGBG, family = binomial)
+
+glm.probs.FBGBG3 <- predict(glm.fit.FBGBG3, FBTest, type = "response")
+
+FB.pred3 <- rep("No", (nrow(FBGBG)/2))
+FB.pred3[glm.probs.FBGBG3 > .5] <- "Yes"
+
+table(FB.pred3, ConferenceGameTest)
+mean(FB.pred3 == ConferenceGameTest)
+
+```
+
+```{r, include = F}
+##Test 3
+set.seed(7)
+
+train <- sample(1:nrow(FBGBG), (nrow(FBGBG)/2))
+FBTest <- FBGBG[-train, ]
+
+ConferenceGameTest <- ConferenceGame[-train]
+
+##Model 1 
+glm.fit.FBGBG1 <- glm(ConferenceGame ~ Temperature, 
+                      data = FBGBG, family = binomial)
+
+glm.probs.FBGBG1 <- predict(glm.fit.FBGBG1, FBTest, type = "response")
+
+FB.pred1 <- rep("No", (nrow(FBGBG)/2))
+FB.pred1[glm.probs.FBGBG1 > .5] <- "Yes"
+
+table(FB.pred1, ConferenceGameTest)
+mean(FB.pred1 == ConferenceGameTest)
+
+
+##Model 2 
+glm.fit.FBGBG2 <- glm(ConferenceGame ~ Temperature + Attendance, 
+                      data = FBGBG, family = binomial)
+
+glm.probs.FBGBG2 <- predict(glm.fit.FBGBG2, FBTest, type = "response")
+
+FB.pred2 <- rep("No", (nrow(FBGBG)/2))
+FB.pred2[glm.probs.FBGBG2 > .5] <- "Yes"
+
+table(FB.pred2, ConferenceGameTest)
+mean(FB.pred2 == ConferenceGameTest)
+
+
+##Model 3
+glm.fit.FBGBG3 <- glm(ConferenceGame ~ Temperature + Attendance + TotalTicketRevenue, 
+                      data = FBGBG, family = binomial)
+
+glm.probs.FBGBG3 <- predict(glm.fit.FBGBG3, FBTest, type = "response")
+
+FB.pred3 <- rep("No", (nrow(FBGBG)/2))
+FB.pred3[glm.probs.FBGBG3 > .5] <- "Yes"
+
+table(FB.pred3, ConferenceGameTest)
+mean(FB.pred3 == ConferenceGameTest)
+```
+
+The results for each model are provided in the table below:
+
+| Model | T1 # Correct | T1 % Correct | T2 # Correct | T2 % Correct | T3 # Correct | T3 % Correct | Total # Correct | Avg. # Correct | Avg. % Correct |
+|:-----:|:------------:|:------------:|:------------:|:------------:|:------------:|:------------:|:---------------:|:--------------:|:--------------:|
+|   I   |       6      |   0.857  |       7      |       1      |       7      |       1      |        20       |    6.667   |  0.952 |
+|   II  |       5      |   0.714  |       7      |       1      |       6      |   0.857  |        18       |        6       |  0.857  |
+|  III  |       6      |   0.857  |       7      |       1      |       7      |       1      |        20       |    6.667  |  0.952  |
+
+To summarize models I and III have the same predictive power. Both of these models correctly predict the status of a game being a Conference Game or not about $95%$ of the time. Model II performed slightly worse with a correct prediction probability of about $85%$. For simplicity in interpretation, the Temperature at Kickoff is all that is needed to predict a conference game or non-conference game. This is because Conference Games take place during the last half of the season, when the weather is typically much colder than the first half of the season. But, we are interested in whether there is a correlation between Conference Games and Total Ticket Revenue. Since, the addition of TOtal Ticket Revenue as a parameter from model II to model III increased the correct prediction rate, one can conclude there is a correlation. 
+
+Through testing, an interesting result is the absence of false negatives (FN), only false positives (FP). A false negative would be predicting the a game is not a conference game, when in fact, it was. A false positive would be predicting that a game is a conference game, when in fact, it wasn't. In total, all three models only produced five errors. As stated, all of these were FPs. Out of the sixty-three total predictions, This gives a $0.0794$ FP Rate. Since there are no FNs, power of the test is 1, which means all these models detect deviations from the null hypothesis, conference game = "No", when there is one every single time. This means that our conclusions from the previous section are correct. Therefore, all of these models are useful in predicting whether a given game is a Conference Game or not. 

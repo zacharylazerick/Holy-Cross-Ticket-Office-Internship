@@ -1,0 +1,225 @@
+---
+title: "2021 vs. 2022 Football Event Sales"
+author: "Zachary Lazerick"
+date: '2022-08-18'
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+**Introduction**
+
+In this document, we will be comparing the Single-Game Ticket Sales of the 2022 Football Season to that of the 2021 Season, in order to obtain an idea of how the 2022 Sales stack up against the previous year. Are we selling more tickets? Less tickets? or about the same number of tickets? In order to due this, we will examining the weekly ticket sales both before and after Single-Game Tickets were available for purchase both seasons. 
+
+**Data Collected**
+
+A summary of important data collected for use in this document is provided below:
+
+Bundle Name -- ID for a specific ticket purchase with a Season Ticket Holder. If an order does not have a bundle name, then the order is only for a single-game.
+
+Event Code -- ID for a specific ticket purchase that identifies which game the ticket purchase was for. ex. FB01 == 2021 Football Season, Home Game 1, 22FB01 == 2022 Football Season, Home Game 1.
+
+Payment Date -- What day the ticket order was made, in mm/dd/yyyy format.
+
+Payment Week -- Number of weeks that passed since single-game tickets were made available for purchase. Week 0 refers to orders made before single-game tickets were made available for purchase. These are all Season Ticket Orders.  
+
+**Disclaimer**
+
+This document is written using Ticket Sale data through 8/23/2022. No games have been played for the 2022 Football Season, and as such, tickets are still available for purchase. Therefore, the ticket sales for the 2022 Season are not final. This is solely to gain a rough estimate and understanding. 
+
+\pagebreak
+
+**Part I: 2021 Single-Game Ticket Sales**
+
+First, we will present the Single-Game Ticket Sales of the 2021 Football Season, in order of game date. These sales will serve as a baseline for the 2022 Football Season. 
+
+The format for each game is as follows, a table will be presented, with the following information: Week # (# of weeks since Single-Game Tickets went live), Date Range (The dates that correspond to each week number), # Ticket Sales (Total number of Ticket Sales for each period), and % Ticket Sales (Percent of Total Sales for said game during each week). 
+
+**Game 1: Merrimack at Holy Cross (9/11/2021)**
+
+|                |  Week 0  |   Week 1  |   Week 2  |   Week 3  |  Week 4  |  Week 5  |   Week 6  |   Week 10   |
+|:--------------:|:--------:|:---------:|:---------:|:---------:|:--------:|:--------:|:---------:|:-----------:|
+|   Date Range   | 5/20-8/9 | 8/10-8/16 | 8/17-8/23 | 8/24-8/30 | 8/31-9/6 | 9/7-9/13 | 9/14-9/20 | 10/12-10/18 |
+| # Ticket Sales |   3169   |     50    |     38    |    167    |    161   |   1549   |     14    |      20     |
+| % Ticket Sales |   61.32  |    0.97   |    0.74   |    3.23   |   3.12   |   29.97  |    0.27   |     0.39    |
+|     # Comps    |     4    |     0     |     4     |     71    |    61    |   1051   |     0     |      20     |
+
+**Game 2: Harvard at Holy Cross (10/2/2021)**
+
+|                |  Week 0  |   Week 1  |   Week 2  |   Week 3  |  Week 4  |  Week 5  |   Week 6  |   Week 7  |   Week 8  |   Week 10   |
+|:--------------:|:--------:|:---------:|:---------:|:---------:|:--------:|:--------:|:---------:|:---------:|:---------:|:-----------:|
+|      Dates     | 5/20-8/9 | 8/10-8/16 | 8/17-8/23 | 8/24-8/30 | 8/31-9/6 | 9/7-9/13 | 9/14-9/20 | 9/21-9/27 | 9/28-10/4 | 10/12-10/18 |
+| # Ticket Sales |   3169   |     75    |     64    |    165    |    116   |    465   |    278    |    318    |    3552   |      20     |
+| % Ticket Sales |   38.54  |    0.91   |    0.78   |    2.01   |   1.41   |   5.66   |    3.38   |    3.87   |   43.20   |     0.39    |
+|     # Comps    |     4    |     0     |     0     |     66    |    51    |    316   |    136    |     78    |    2138   |      20     |
+
+**Game 3: Georgetown at Holy Cross (10/16/2021)**
+
+|                |  Week 0  |   Week 1  |   Week 2  |   Week 3  |  Week 4  |  Week 5  |   Week 6  |   Week 7  |   Week 8  |   Week 9   |   Week 10   |
+|:--------------:|:--------:|:---------:|:---------:|:---------:|:--------:|:--------:|:---------:|:---------:|:---------:|:----------:|:-----------:|
+|      Dates     | 5/20-8/9 | 8/10-8/16 | 8/17-8/23 | 8/24-8/30 | 8/31-9/6 | 9/7-9/13 | 9/14-9/20 | 9/21-9/27 | 9/28-10/4 | 10/5-10/11 | 10/12-10/18 |
+| # Ticket Sales |   3169   |     47    |     40    |    147    |    114   |    422   |    152    |     35    |     49    |     27     |     1753    |
+| % Ticket Sales |   53.22  |    0.79   |    0.67   |    2.47   |   1.91   |   7.09   |    2.55   |    0.59   |    0.82   |    0.45    |    29.44    |
+|     # Comps    |     4    |     0     |     0     |     60    |    51    |    316   |    136    |     13    |     27    |      0     |     1411    |
+
+\pagebreak
+
+**Game 4: Colgate at Holy Cross (10/23/2021)**
+
+This is the 1st Polar Park Game. However, ticket sales for this game were hosted by the Worcester Red Sox Organization, and due to this fact, we have no personal record of the Ticket Sale data for this game. The only sales data for this game is DCU-Club presale tickets, which were hosted by Holy Cross.
+
+|                |  Week 0  |   Week 1  |   Week 2  |   Week 3  |
+|:--------------:|:--------:|:---------:|:---------:|:---------:|
+|      Dates     | 5/20-8/9 | 8/10-8/16 | 8/17-8/23 | 8/24-8/30 |
+| # Ticket Sales |    348   |     11    |     0     |     2     |
+| % Ticket Sales |   96.40  |    3.05   |     0     |    0.55   |
+|     # Comps    |     5    |     0     |     0     |     0     |
+
+**Game 5: Lafayette at Holy Cross (11/6/2021)**
+
+|                |  Week 0  |   Week 1  |   Week 2  |   Week 3  |  Week 4  |  Week 5  |   Week 6  |   Week 7  |   Week 8  |   Week 9   |   Week 10   |   Week 11   |   Week 12  |  Week 13  |
+|:--------------:|:--------:|:---------:|:---------:|:---------:|:--------:|:--------:|:---------:|:---------:|:---------:|:----------:|:-----------:|:-----------:|:----------:|:---------:|
+|      Dates     | 5/20-8/9 | 8/10-8/16 | 8/17-8/23 | 8/24-8/30 | 8/31-9/6 | 9/7-9/13 | 9/14-9/20 | 9/21-9/27 | 9/28-10/4 | 10/5-10/11 | 10/12-10/18 | 10/19-10/25 | 10/26-11/1 | 11/2-11/6 |
+| # Ticket Sales |   3169   |     45    |     34    |    152    |    98    |    404   |    150    |     27    |     53    |     10     |     113     |      28     |     92     |    1700   |
+| % Ticket Sales |   52.16  |    0.74   |    0.56   |    2.50   |   1.61   |   6.65   |    2.47   |    0.44   |    0.87   |    0.16    |     1.86    |     0.46    |    1.51    |   27.98   |
+|     # Comps    |     4    |     0     |     0     |     60    |    51    |    316   |    136    |     13    |     27    |      0     |      70     |      0      |      0     |    1121   |
+
+A rough trend can be outlined for all of these games. Season Ticket Sales (Week 0) account for the sizable portion of tickets sold for each of these games. Then, sales die down, accounting for maybe 10-15% of Total Sales until the week of the game, where there is the other sizable portion of tickets sold, where the majority of these sales, are likely on game-day. 
+
+\pagebreak
+
+**Part II: 2022 Single Game Ticket Sales**
+
+Next, we will look at the Single-Game Ticket Sales of the 2022 Football Season, in order of game date. Data will be presented in the same format as before. 
+
+**Game 1: Yale at Holy Cross (9/17/2022)**
+
+|                |  Week 0 |  Week 1 |   Week 2  |   Week 3  |
+|:--------------:|:-------:|:-------:|:---------:|:---------:|
+|      Dates     | 4/9-8/2 | 8/3-8/9 | 8/10-8/16 | 8/17-8/23 |
+| # Ticket Sales |   3305  |    51   |    135    |     62    |
+| % Ticket Sales |  93.02  |   1.44  |    3.80   |    1.75   |
+|     # Comps    |    2    |    0    |     0     |     0     |
+
+**Game 2: Bucknell at Holy Cross (10/8/2022)**
+
+This is the 2nd Polar Park Game. Unlike the 2021 Season, 2022 Season Ticket Holders received a ticket to the polar park game included with the Season Ticket Price. 
+
+|                |  Week 0 |  Week 1 |   Week 2  |   Week 3  |
+|:--------------:|:-------:|:-------:|:---------:|:---------:|
+|      Dates     | 4/9-8/2 | 8/3-8/9 | 8/10-8/16 | 8/17-8/23 |
+| # Ticket Sales |   3144  |    36   |     86    |     43    |
+| % Ticket Sales |  95.01  |   1.09  |    2.60   |    1.30   |
+|     # Comps    |    2    |    0    |     0     |     0     |
+
+**Game 3: Fordham at Holy Cross (10/29/2022)**
+
+|                |  Week 0 |  Week 1 |   Week 2  |   Week 3  |
+|:--------------:|:-------:|:-------:|:---------:|:---------:|
+|      Dates     | 4/9-8/2 | 8/3-8/9 | 8/10-8/16 | 8/17-8/23 |
+| # Ticket Sales |   3305  |    73   |    146    |    104    |
+| % Ticket Sales |  91.10  |   2.01  |    4.02   |    2.87   |
+|     # Comps    |    2    |    0    |     0     |     0     |
+
+**Game 4: Lehigh at Holy Cross (11/5/2022)**
+
+|                |  Week 0 |  Week 1 |   Week 2  |   Week 3  |
+|:--------------:|:-------:|:-------:|:---------:|:---------:|
+|      Dates     | 4/9-8/2 | 8/3-8/9 | 8/10-8/16 | 8/17-8/23 |
+| # Ticket Sales |   3288  |    37   |     94    |     51    |
+| % Ticket Sales |  94.76  |   1.07  |    2.71   |    1.47   |
+|     # Comps    |    2    |    0    |     0     |     0     |
+
+**Game 5: Bryant at Holy Cross (11/12/2022)**
+
+|                |  Week 0 |  Week 1 |   Week 2  |   Week 3  |
+|:--------------:|:-------:|:-------:|:---------:|:---------:|
+|      Dates     | 4/9-8/2 | 8/3-8/9 | 8/10-8/16 | 8/17-8/23 |
+| # Ticket Sales |   3293  |    37   |     94    |     51    |
+| % Ticket Sales |  94.76  |   1.06  |    2.71   |    1.47   |
+|     # Comps    |    2    |    0    |     0     |     0     |
+
+We see the same rough trend as before for the 2022 Season as the 2021 Season. Week 0 are >=90% of Total Ticket Sales for each game, and then sales take a serious dip, once single-game Tickets go live. 
+
+\pagebreak
+
+**Part III: The 2021 vs. 2022 Season Ticket Sales**
+
+Now that we have presented the Single-Game Ticket Sales for the 2021 and 2022 Football Season on their own, we can compare the two seasons. For transparency, we will only be directly comparing the difference between the two season's sales for the first three weeks since the release of season ticket sales. This is because the sales are ongoing, and only the first three weeks of sales are complete for both seasons. 
+
+For simplicity, we will subtract the 2021 Single-Game Ticket Sales from the 2022 Single-Game Ticket Sales. (The conclusions remain the same, regardless of subtraction order, only the numbers will have opposite signs). Thus, a positive value denotes a game where more tickets have been sold for the 2022 Season than the 2021 Season, and a negative value denotes a game where more tickets have been sold for the 2021 Season than the 2022 Season.
+
+**Game 1 Comparison**
+
+|            | Week 0 | Week 1 | Week 2 | Week 3 |
+|:----------:|:------:|:------:|:------:|:------:|
+|    FB21    |  3169  |   50   |   38   |   167  |
+|    FB22    |  3305  |   51   |   135  |   62   |
+| Difference |   136  |    1   |   97   |  -105  |
+
+**Game 2 Comparison**
+
+|            | Week 0 | Week 1 | Week 2 | Week 3 |
+|:----------:|:------:|:------:|:------:|:------:|
+|    FB21    |  3169  |   75   |   64   |   165  |
+|    FB22    |  3144  |   36   |   86   |   43   |
+| Difference |   -25  |   -39  |   22   |  -122  |
+
+
+**Game 3 Comparison**
+
+|            | Week 0 | Week 1 | Week 2 | Week 3 |
+|:----------:|:------:|:------:|:------:|:------:|
+|    FB21    |  3169  |   47   |   40   |   147  |
+|    FB22    |  3305  |   73   |   146  |   104  |
+| Difference |   136  |   26   |   106  |   -43  |
+
+**Game 4 Comparison**
+
+|            | Week 0 | Week 1 | Week 2 | Week 3 |
+|:----------:|:------:|:------:|:------:|:------:|
+|    FB21    |   348  |   11   |    0   |    2   |
+|    FB22    |  3288  |   37   |   94   |   51   |
+| Difference |  2940  |   26   |   94   |   49   |
+
+**Game 5 Comparison**
+
+|            | Week 0 | Week 1 | Week 2 | Week 3 |
+|:----------:|:------:|:------:|:------:|:------:|
+|    FB21    |  3169  |   45   |   31   |   152  |
+|    FB22    |  3293  |   37   |   94   |   51   |
+| Difference |   124  |   -8   |   63   |  -101  |
+
+\pagebreak
+
+**Additional Breakdown: Polar Park Game Comparison**
+
+As mentioned previously, for the 2022 Season, a ticket to the Polar Park Game was included in the Season Ticket Price, unlike the 2021 Season, where this was not the case. This is why we are comparing the difference in sales for the two Polar Park Games. 
+
+|            | Week 0 | Week 1 | Week 2 | Week 3 |
+|:----------:|:------:|:------:|:------:|:------:|
+|    FB21    |   348  |   11   |    0   |    2   |
+|    FB22    |  3144  |   36   |   86   |   43   |
+| Difference |  2957  |   40   |   135  |   60   |
+
+Now, because of this change, we see that the number of Single Game Tickets Sold for the Polar Park Games during the Season Ticket Renewal Period (Week 0) for the 2022 Season is almost 10 times that for the 2021 Season. Again, for the first three weeks of Single-Game Ticket Sales, those who buy season tickets during this time in 2022 also get a ticket for the Polar Park Game, explaining the majority of the Difference in Sales between these two games for both seasons. 
+
+**Summary of Differences**
+
+|           | Week 0  | Week 1 | Week 2 | Week 3 |
+|:---------:|:-------:|:------:|:------:|:------:|
+| DiffGame1 |   136   |    1   |   97   |  -105  |
+| DiffGame2 |   -25   |   -39  |   22   |  -122  |
+| DiffGame3 |   136   |   26   |   106  |   -43  |
+| DiffGame4 |   2940  |   26   |   94   |   49   |
+| DiffGame5 |   124   |   -8   |   63   |  -101  |
+
+As before, a negative value corresponds to a game where the 2021 Season sold more Single-Game Tickets than the 2022 Season, and a positive value corresponds to a game where the 2022 Season sold more Single-Game Tickets than the 2021 Season. In total, there are 7 (35% of data points) instances where the 2021 Season sold more Single-Game Tickets than the 2022 Season. Therefore, it can be argued that the 2022 Single-Game Ticket Sales are on track, if not surpassing those of the 2021 Season. 
+
+The Average Difference is 168.85. This means that, on average, the Single-Game Ticket Sales for the 2022 Season sell 168 more tickets than those for the 2021 Season during the renewal period, and the first three weeks of Single-Game Ticket Sales. Without including the obvious outlier of 2940 ticket difference, the average difference is 21.85. S0, without the outlier, the 2022 Season is only selling 21 more Single-Game tickets during this three week period than the 2021 Season. 
+
+Since no games have taken place yet (and the first home game is not until the middle of September), we have not seen the spike we saw before during the week of the game. There is not enough data to say for certain whether this trend will continue, or not, but for the data we have now, the 2022 Ticket Sales appear to be on track, if not better, when compared to the 2021 Season. 
+
+\pagebreak

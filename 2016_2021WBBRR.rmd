@@ -1,0 +1,157 @@
+---
+title: "2016-2021 Women's Basketball Revenue Report"
+author: "Zachary Lazerick"
+date: '2022-08-15'
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+**Introduction**
+
+In this document, we are going to perform an analysis of the Women's Basketball Season Ticket Program. In doing so, we hope to access the overall performance of said program, and the overall direction of it. Is this program growing, shrinking, or stagnant? In answering this question, we will address any shortcomings, or issues facing the program, and attempt to provide remedies to said issues, as well as addressing areas where the program excels. 
+
+**Data Collected**
+
+For this study, we have collected the following data:
+
+Season -- The Season of Women's Basketball, e.g. 2021 refers to the 2021-22 Season.
+
+Renewed Accounts -- The number of Season Ticket Holders that renewed their Season Tickets from the previous season. 
+
+Renewed Tickets -- The number of Season Tickets renewed by Renewed Accounts.
+
+Renewed Revenue -- The amount of Revenue earned via the purchase of Renewed Season Tickets. This is measured in USD ($).
+
+New Accounts -- The number of Season Ticket Holders that did not have Season Tickets the previous season. 
+
+New Tickets -- The number of Season Tickets purchased by New Accounts.
+
+New Revenue -- The amount of Revenue earned via the purchase of New Season Tickets. This is measured in USD ($). 
+
+Renewal Rate -- The proportion of Season Ticket Holders that renewed their season ticket status from the previous season. This is measured as a percentage (%).
+
+**Acknowledgements and Assumptions**
+
+1) The Data used in this study was obtained from Holy Cross Ticket Office Revenue Reports. The accuracy of conclusions made in this report are predicated on the accuracy of the data contained in said Revenue Reports. 
+
+2) Due to the COVID-19 Pandemic, fans were not allowed to attend Women's Basketball games for the 2020 season. Thus, no season tickets were available to purchase for this season. Therefore, the 2020 season in any graph below should be treated as a "hole", as in no data available. Any "data point" for the 2020 season should not be regarded as accurate. 
+
+```{r, include = F}
+##Read in the Data
+WBRR <- read.csv("2016_2021WBBRR.csv")
+
+##Attach for easier function calls
+attach(WBRR)
+
+##Calculate totals
+TotalAccounts <- RenewedAccounts + NewAccounts
+TotalTickets <- RenewedTickets + NewTickets
+TotalRevenue <- RenewedRevenue + NewRevenue
+```
+
+\pagebreak
+
+**Part I: Total Season Ticket Sales Metrics**
+
+The first part of this study will examine the Total Season Ticket Sales metrics for Women's Basketball. The metrics we will look at here at the Total Season Ticket Accounts, Total Season Tickets Sold, and Total Season Ticket Revenue. Graphs of each of these metrics are provided below:
+
+```{r, out.width = "50%", out.height = "50%"}
+##Season vs. TotalAccounts
+plot(Season, TotalAccounts, type = "l", col = "red", lwd = 3, 
+     main = "Total Season Ticket Accounts per Season", 
+     xlab = "Season", ylab = "Accounts")
+
+
+##Season vs. TotalTickets
+plot(Season, TotalTickets, type = "l", col = "red", lwd = 3, 
+     main = "Total Season Ticket Sold per Season", 
+     xlab = "Season", ylab = "Tickets")
+```
+
+```{r, fig.align = "center", out.width = "50%", out.height = "50%"}
+##Season vs. TotalRevenue
+plot(Season, TotalRevenue, type = "l", col = "red", lwd = 3, 
+     main = "Total Season Ticket Revenue per Season", 
+     xlab = "Season", ylab = "Revenue ($)")
+```
+
+In these graphs we see the overall performance of the Women's Basketball Program. First thing that catches the eye is that there have never been 10 or more Season Ticket Holders for Women's Basketball. This number is much lower than any other Season Ticket Program we have looked at. Similarly, this program also appears to be at the bottom of the ladder with respect to Total Season Tickets Sold, and Total Season Ticket Revenue. These poor results can be explained by the lack of Season Ticket Account Holders. Therefore, Women's Basketball is the least popular ticketed sport offered by Holy Cross. 
+
+\pagebreak
+
+```{r, include = F}
+##Set Parameters
+cols <- c("red", "blue")
+par(lwd = 1)
+```
+
+Now, to keep in line with previous reports, we will now look at the breakdown of Renewed and New Season Ticket Metrics. Graphs of these breakdowns are provided below:
+
+```{r, out.width = "50%", out.height = "50%"}
+##Renewed vs. New Accounts
+barplot(t(WBRR[c("RenewedAccounts", "NewAccounts")]), 
+        beside = T, 
+        ylim = c(0, max(WBRR[c("RenewedAccounts", "NewAccounts")]) * 1.2), 
+        border = cols, col = cols, names.arg = WBRR$Season, 
+        main = "Renewed vs. New Accounts", 
+        xlab = "Season", ylab = "Accounts")
+box()
+legend("topright", cex = 1, fill = cols, 
+       legend = c("Renewed Accounts", "New Accounts"))
+
+##Renewed vs. New Tickets
+barplot(t(WBRR[c("RenewedTickets", "NewTickets")]), 
+        beside = T, 
+        ylim = c(0, max(WBRR[c("RenewedTickets", "NewTickets")]) * 1.2), 
+        border = cols, col = cols, names.arg = WBRR$Season, 
+        main = "Renewed vs. New Tickets", 
+        xlab = "Season", ylab = "Tickets")
+box()
+legend("topright", cex = 1, fill = cols, 
+       legend = c("Renewed Tickets", "New Tickets"))
+```
+
+```{r, fig.align = "center", out.width = "50%", out.height = "50%"}
+##Renewed vs. New Revenue
+barplot(t(WBRR[c("RenewedRevenue", "NewRevenue")]), 
+        beside = T, 
+        ylim = c(0, max(WBRR[c("RenewedRevenue", "NewRevenue")]) * 1.2), 
+        border = cols, col = cols, names.arg = WBRR$Season, 
+        main = "Renewed vs. New Revenue", 
+        xlab = "Season", ylab = "Revenue ($)")
+box()
+legend("topright", cex = 1, fill = cols, 
+       legend = c("Renewed Revenue", "New Revenue"))
+```
+
+Here, we see that New Accounts, Tickets, and Revenue account for the majority of the Total Season Ticket Metrics. This is unlike previous reports, where on average, Renewed Season Ticket Metrics were the majority of the Total Season Ticket Metrics. Therefore, there is evidence to suggest that fan retention is an issue facing the Women's Basketball Season Ticket Program. 
+
+Since fan retention appears to be an issue, we can also conclude that fan satisfaction is also an issue, because these two factors are highly correlated. Why is this an issue? That can be the result of a multitude of factors, but a simple answer is the performance of the Women's Basketball Team over the past few seasons. 
+
+Another answer to this question is the lack of advertising, or publicity, of the Team, or the Season Ticket Program itself. 
+
+\pagebreak
+
+**Part II: Renewal Rates**
+
+To conclude this report, we will look at the Renewal Rates of the Women's Basketball Season Ticket Program. The renewal rate for the program can be measured in two different ways, the Account Renewal Rate, and the Ticket Renewal Rate. The Account Renewal Rate like the Renewal Rate definition given above, is the proportion of Season Ticket Accounts that bought Season Tickets for both the current season, and the previous season. The Ticket Renewal Rate can be defined in a similar way. Graphs of the Account and Ticket Renewal Rates are provided below:
+
+```{r, out.width = "50%", out.height = "50%"}
+##Account Renewal Rate per Season
+plot(Season, AccountRenewalRate, type = "l", col = "red", lwd = 3, 
+     main = "Account Renewal Rate each Season", 
+     xlab = "Season", ylab = "Renewal Rate (%)")
+
+##Ticket Renewal Rate per Season
+plot(Season, TicketRenewalRate, type = "l", col = "red", lwd = 3, 
+     main = "Ticket Renewal Rate each Season", 
+     xlab = "Season", ylab = "Renewal Rate (%)")
+```
+
+Here we see further evidence of the Fan Retention and Fan Satisfaction issues first noticed above. Aside from the 2017 season, where both the Account Renewal Rate and Ticket Renewal Rate are greater than 100%, which must stem from a misreporting of data from 2017, since a result like this is impossible, we see that the renewal rate averages below 50%. Therefore, less than half of Season Ticket Holders are returning to the program each season. This is simply unacceptable. 
+
+Like before, this might be explained by the performance of the Women's Basketball Team itself. But might also be explained by lack of publicity of the Women's Basketball Season Ticket Program. Further investigation is required to provide proof of these claims. 
+\pagebreak

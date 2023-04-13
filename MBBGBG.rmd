@@ -1,0 +1,417 @@
+---
+title: "Men's Basketball Game-by-Game Report"
+author: "Zachary Lazerick"
+date: '2022-06-27'
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(warnings = FALSE)
+```
+
+```{r, include = F}
+##Document Setup
+
+##Data Set
+MBBGBG <- read.csv("2014_2021MBBGBG.csv")
+
+##Save Total Tickets Scanned for later
+##Only Data from 2021 Available
+##Previous data is unavailable due to constant system migration
+##Also Missing data for 2 of the 2021 games
+TotalTicketsScanned <- MBBGBG$TotalScannedTickets
+TotalTicketsScanned <- na.omit(TotalTicketsScanned)
+TotalTicketsScanned
+##Deletes TotalTicketsScanned Column from data set
+MBBGBG <- MBBGBG[, -14]
+
+##Order Factor Day of Week
+MBBGBG$GameDoW <- ordered(MBBGBG$GameDoW, levels = c("Sunday", "Monday", "Tuesday", 
+                                                    "Wednesday", "Thursday", 
+                                                    "Friday", "Saturday"))
+
+##Order Factor Game Time
+MBBGBG$GameTime <- ordered(MBBGBG$GameTime, levels = c("12:00", "13:00", 
+                                                       "14:00",
+                                                       "15:00", "16:00", 
+                                                       "17:00", 
+                                                       "19:00", "20:00"))
+
+##Create isSpecial Variable ##Binary to check Occasion Status
+isSpecial <- rep("Yes", 95)
+
+for (i in 1:nrow(MBBGBG)) {
+  if (MBBGBG$Occasion[i] == "Home") {
+    isSpecial[i] <- "No"
+  }
+  else {
+    isSpecial[i] <- "Yes"
+  }
+}
+
+##Set isSpecial as a Factor
+isSpecial <- as.factor(isSpecial)
+
+##Set Occasion as an Ordered Factor
+MBBGBG$Occasion <- ordered(MBBGBG$Occasion, levels = c("Home", "Home-Opener", 
+                                                       "Senior Day", "Winter 
+                                                       Homecoming",
+                                                       "Toy's For Tots", 
+                                                       "Turnpike Trophy",
+                                                       "Salute to Service", 
+                                                       '"Color" Out',
+                                                       "Brooklyn Hoops 
+                                                       Invitational", 
+                                                       "Banner Raising 
+                                                       Ceremony"))
+
+attach(MBBGBG)
+```
+
+**Introduction**
+
+In this report, we will be examining the past eight Men's Basketball Seasons to obtain an understanding the direction of the program's performance. To do this, we will be using individual game statistics like Single-Game Ticket Sales, and the revenue earned from those sales, from all Regular Season Home Games from these eight seasons. In doing so, we will able be attempt to find solutions to any issues facing the program.
+
+**The Data**
+
+An explanation of data collected and used for this study is provided below:
+
+Opponent -- The opponent Holy Cross played for a specific game.
+
+Event ID -- A unique identifier for each game, ex. MB1401 refers to the first Men's Basketball home game from the 2014 season. 
+
+Game Date -- The date a specific game was played, in mm/dd/yyyy format.
+
+Game DoW -- The day of the week that a specific game was played.
+
+Game Time -- The time of day that a specific game was played, in 24-hour format, ex. 19:00 refers to a game played at 7:00 p.m.
+
+Season -- The Men's Basketball Season that a specific game was played in.
+
+Location -- The venue where a specific game was played in. Hart Center refers to the Home Gymnasium of the Holy Cross Men's Basketball Team.
+
+Occasion -- Any special occasion or celebration that occurred during that game. "Home" simply refers to a game with no occasions.
+
+Conference Game -- Binary variable to indicate if a specific game was a conference game or not. "Yes" means that the opponent is a member of the Patriot League, "No" means that the opponent is not a member of the Patriot League.
+
+Attendance -- The attendance of a specific game as indicated by each game's official NCAA box score. 
+
+Total Tickets Sold -- The total number of tickets that were sold for a specific game. This is the number of tickets that earned some amount of revenue. This metric does not include complimentary tickets.
+
+Total Ticket Revenue -- The total amount of revenue earned from a specific game's total ticket sales.
+
+Total Tickets Out -- The total number of tickets that were made available to the public for a specific game. This metric does include complimentary tickets. This is calculated as the  Total Number of Tickets Sold + Total Number of Complimentary Tickets. 
+
+Total Tickets Scanned -- The total number of tickets that were scanned at the entrance to a given game. 
+
+\pagebreak
+
+**Section I: Totals**
+
+Again, our goal in this report is to analyze the performance of the Holy Cross Men's Basketball Team through individual game metrics. However, in order to do that, we will need to start with a snapshot of how the team performs each season. In this section, we will do by looking at graphs of how many Tickets the team has Sold each Season, as well of the amount of Revenue earned each Season from said Ticket Sales. Afterward, we will also examine the number of Tickets the team puts Out, or Makes Available, to the public each Season. 
+
+**Assumptions and Acknowledgements**
+
+1) Due to the COVID-19 Pandemic, there was an abbreviated 2020 Men's Basketball season. However, fan attendance was not permitted for those games. Hence, all ticket sales were refunded. Therefore, there is no ticket data available for this season. As such, this season will not contribute in any meaningful way to this report. This means that the 2020 season should be treated as a "hole", meaning no data, in the graph. Thus, the 2020 "data point" in any graph or figure provided below has no interpretability for our purposes.
+
+2) All data used in this report is sourced from The Holy Cross Ticket Office Event Audits, official NCAA box scores, as well as other Online Databases. The accuracy of conclusions made in this report are predicated on the accuracy of the data provided from the sources mentioned above. All data is updated as of June 27th, 2022. 
+
+\pagebreak
+
+```{r}
+##Because UMASS Amherst v. Holy Cross played at the DCU Center in 2016, 
+##The Total Tickets Sold, Total Ticket Revenue, and Total Tickets Out
+##Are unavailable for this game, therefore, Season Totals for these metrics are 
+##Unable to be calculated, and only estimated for this season. 
+SeasonTotals2016 <- rep(0, 3)
+SeasonTotals2016[1] <- 9754
+SeasonTotals2016[2] <- 80258.07
+SeasonTotals2016[3] <- 15884
+
+##Total Number of Tickets Sold (i.e. Those that earned revenue) for each season
+SeasonTotalTicketsSold <- rep(0, 7)
+for(i in 1:6) {
+    SeasonTotalTicketsSold[i] <- sum(TotalTicketsSold[Season == 2013 + i])
+}
+SeasonTotalTicketsSold[3] <- SeasonTotals2016[1]
+SeasonTotalTicketsSold[7] <- sum(TotalTicketsSold[Season == 2021])
+
+##Total Amount of Ticket Revenue each Season
+SeasonTotalTicketRevenue <- rep(0, 7)
+for(i in 1:6) {
+    SeasonTotalTicketRevenue[i] <- sum(TotalTicketRevenue[Season == 2013 + i])
+}
+SeasonTotalTicketRevenue[3] <- SeasonTotals2016[2]
+SeasonTotalTicketRevenue[7] <- sum(TotalTicketRevenue[Season == 2021])
+
+##Total Number of Tickets Out each Season
+SeasonTotalTicketsOut <- rep(0, 7)
+for(i in 1:6) {
+  SeasonTotalTicketsOut[i] <- sum(TotalTicketsOut[Season == 2013 + i])
+}
+SeasonTotalTicketsOut[3] <- SeasonTotals2016[3]
+SeasonTotalTicketsOut[7] <- sum(TotalTicketsOut[Season == 2021])
+
+##Define a Year Variable
+Year <- c(2014, 2015, 2016, 2017, 2018, 2019, 2021)
+```
+
+**Part I: Context and End-of-Season Totals**
+
+To start, we will look at the overall and conference records of the Holy Cross Men's Basketball Team over these past eight seasons. A table of these metrics is provided below:
+
+| Season | Overall Record | Patriot League Record | PL Placement |
+|:------:|:--------------:|:---------------------:|:------------:|
+|  2021  |      9-21      |          7-11         |      7th     |
+|  2019  |      3-29      |          2-16         |     10th     |
+|  2018  |      16-17     |          6-12         |     10th     |
+|  2017  |      12-19     |          8-10         |      6th     |
+|  2016  |      15-17     |          9-9          |      5th     |
+|  2015* |      15-20     |          5-13         |      9th     |
+|  2014  |      14-16     |          8-10         |      6th     |
+
+*Appeared in NCAA Tournament
+
+Now with that in mind, here are the end-of-season Total Tickets Sold, Total Ticket Revenue, and Total Tickets Out for these past eight seasons. The results are provided in the figures below:
+
+```{r, out.width = "50%", out.height = "50%"}
+plot(Year, SeasonTotalTicketsSold, type = "l", col = "red", lwd = 3, 
+     main = "Total Amount of Tickets Sold each Season", 
+     xlab = "Season", ylab = "Amount of Tickets")
+
+plot(Year, SeasonTotalTicketRevenue, type = "l", col = "red", lwd = 3, 
+     main = "Total Amount of Revenue Earned each Season", 
+     xlab = "Season", ylab = "Revenue ($)")
+```
+
+```{r, fig.align = "center", out.width = "50%", out.height = "50%"}
+plot(Year, SeasonTotalTicketsOut, type = "l", col = "red", lwd = 3, 
+     main = "Total Amount of Tickets Out each Season", 
+     xlab = "Season", ylab = "Amount of Tickets")
+```
+
+Here we see roughly the same trends in all three graphs. From our baseline in 2014, these metrics increase each season up until the 2018, where afterward everything is in sharp decline. Due to the COVID-19 Pandemic, it is tough to assign proper blame as to why there are fewer and fewer people buying tickets to Men's Basketball games in the past couple seasons. However, due to the mediocrity the team has faced since the 2016 season with no winning record, overall or in-conference, one can imagine that few people would be willing to watch it play. 
+
+\pagebreak
+
+
+**Section II: Single Game Breakdowns**
+
+Now that we have an understanding of the overall performance of the Men's Basketball Team for the past eight seasons, we can begin to break down this performance in terms of different metrics. 
+
+**Part I:Single-Game per Season**
+
+First, we will look at the spread of different metrics over the course of a season. We will start by looking at the Total Single-Game Ticket Sales for each game. The resulting boxplot is shown below:
+
+```{r}
+cols = c("pink", "red", "light green", "light blue", "blue", "violet", "purple")
+
+##Boxplot of Game Ticket Sales by Season
+boxplotTTSS <- boxplot(TotalTicketsSold ~ Season, data = MBBGBG, 
+                       main = "Single-Game Ticket Sale Spread each Season",
+                       xlab = "Season", ylab = "Ticket Sales", 
+                       col = cols)
+```
+
+And, below is a table of all the summary statistics from the above plot:
+
+|                | 2014 | 2015 | 2016 | 2017 | 2018 | 2019  | 2021 |
+|----------------|------|------|------|------|------|-------|------|
+| Minimum        | 320  | 396  | 433  | 372  | 242  | 286   | 0    |
+| First Quartile | 435  | 520  | 560  | 493  | 386  | 364   | 169  |
+| Median         | 529  | 597  | 640  | 760  | 616  | 461.5 | 195  |
+| Third Quartile | 568  | 857  | 712  | 784  | 821  | 584   | 353  |
+| Maximum        | 568  | 1234 | 747  | 977  | 1016 | 726   | 460  |
+
+In support of the previous claim, with the decline of end-of-season Total Tickets Sold, we see an obvious decrease in Ticket Sales the past 2 seasons, as well as a decrease in the variability of Single Game Ticket Sales. 
+
+\pagebreak
+
+Next, we will look at the Total Single-Game Ticket Revenue:
+
+```{r}
+##Boxplot of Game Revenue by Season
+boxplotTTRS <- boxplot(TotalTicketRevenue ~ Season, data = MBBGBG, 
+                       main = "Single-Game Ticket Revenue Spread each Season", 
+                       xlab = "Season", ylab = "Revenue ($)", 
+                       col = rainbow(7))
+```
+
+Similarly, a table of the summary statistics is provided below:
+
+|                |   2014  |   2015  |   2016  |   2017  |   2018  |   2019  |   2021  |
+|:--------------:|:-------:|:-------:|:-------:|:-------:|:-------:|:-------:|:-------:|
+|     Minimum    | 2916.06 | 3080.93 | 4189.39 | 3507.69 | 2751.55 | 2801.82 | 2479.95 |
+| First Quartile | 3637.72 | 3440.93 | 4576.39 | 4351.69 | 3560.55 | 3422.82 | 2529.11 |
+|     Median     | 4071.06 | 3915.93 | 5474.39 | 5351.69 | 5095.55 | 4441.32 | 2884.11 |
+| Third Quartile | 4389.06 | 6276.93 | 6184.39 | 7326.69 | 6192.55 | 6111.82 | 4062.11 |
+|     Maximum    | 4389.06 | 9461.93 | 7219.39 | 9153.41 | 8681.55 | 6581.82 | 5285.77 |
+
+Like before, there is an obvious decrease in Total Ticket Revenue this past season. However, what is interesting is that the median Single-Game Ticket Revenue remains somewhat constant aside from this past season. This means that adjusting for increasing ticket prices, less people are buying tickets to games year-over-year. 
+
+\pagebreak
+
+Finally, we have the Total Single-Game Tickets Out:
+
+```{r}
+##Boxplot of Game Total Tickets Out by Season
+boxplotTTOS <- boxplot(TotalTicketsOut ~ Season, data = MBBGBG,
+                       main = "Single-Game Tickets Out Spread by each Season", 
+                       xlab = "Season", ylab = "Tickets Out", 
+                       col = cols)
+```
+
+Complete with summary statistics:
+
+|                | 2014 | 2015 | 2016 | 2017 | 2018 | 2019 | 2021 |
+|----------------|------|------|------|------|------|------|------|
+| Minimum        | 727  | 846  | 920  | 867  | 552  | 556  | 203  |
+| First Quartile | 842  | 1027 | 1047 | 990  | 714  | 649  | 306  |
+| Median         | 936  | 1055 | 1132 | 1255 | 930  | 805  | 471  |
+| Third Quartile | 975  | 1365 | 1219 | 1279 | 1157 | 879  | 711  |
+| Maximum        | 975  | 1687 | 1452 | 1472 | 1326 | 1035 | 977  |
+
+Here we see much of the same as Total Single-Game Tickets Sold. Tracing the medians for each season we see a concave curve, meaning that the median Single-Game Tickets Out is steadily decreaseing, after leveling out in the 2017 season. 
+
+\pagebreak
+
+**Part II: Single-Game per Other Factors**
+
+With the basic metrics out of the way, we can analyze game trends. For simplicity, we will only be looking at each factor in terms of the Total Tickets Sold for each game. Here, we assume that the Total Tickets Sold is representative of the Total Ticket Revenue and Total Tickets Out given the high correlation between these three metrics. 
+
+First, we will look at the Total Single-Game Tickets Sold as a factor of the Day of the Week a given game falls on. The resulting boxplot is displayed below:
+
+```{r, fig.align = "center", out.width = "75%", out.height = "75%"}
+##Boxplot of Game Total Tickets Sold by Day of Week
+boxplotTTSDOW <- boxplot(TotalTicketsSold ~ GameDoW, data = MBBGBG, 
+                         main = "Single-Game Tickets Sold by Day of Week",
+                         xlab = "Day of Week", ylab = "Tickets Sold", 
+                         col = cols, na.action = NULL)
+```
+
+Like before, here are the summary statistics for these boxplots:
+
+|                | Sunday | Monday | Tuesday | Wednesday | Thursday | Friday | Saturday |
+|----------------|--------|--------|---------|-----------|----------|--------|----------|
+| Minimum        | 422    | 169    | 355     | 169       | 286      | 0      | 167      |
+| First Quartile | 555    | 433    | 359.5   | 372       | 365      | 347    | 493      |
+| Median         | 729.5  | 501    | 375     | 518.5     | 420      | 640    | 648      |
+| Third Quartile | 857    | 625    | 394.5   | 568       | 635      | 705.5  | 977      |
+| Maximum        | 1192   | 843    | 409     | 669       | 784      | 767    | 1530     |
+
+Saturday games have the most variability, whereas games during the week have roughly the same variability. However, the increase in variability does not mean an increase in average revenue. Tracing the medians for each day of the week, we see that the form a convex curve, but the changes are very minimal. Therefore, there is not enough statistical evidence to conclude that a game on any given day of the week sells more tickets than any other day. Tuesdays appear to b e an outlier in this discussion with a small sample size. 
+\pagebreak
+
+Next, we will move on to Total Single-Game Tickets Sold as a factor of the Time a certain game was played: 
+
+```{r}
+##Boxplot of Single Game Tickets Sold by Game Time
+cols <- rainbow(length(factor(levels(GameTime))))
+boxplotTTSGT <- boxplot(TotalTicketsSold ~ GameTime, data = MBBGBG, 
+                        main = "Single-Game Tickets Sold by Game Time", 
+                        xlab = "Game Time", ylab = "Tickets Sold", 
+                        col = cols, na.action = NULL)
+```
+
+With summary statistics:
+
+|                | 12:00 | 13:00 | 14:00  | 15:00 | 16:00 | 17:00 | 19:00 | 20:00 |
+|----------------|-------|-------|--------|-------|-------|-------|-------|-------|
+| Minimum        | 422   | 171   | 167    | 493   | 499   | 165   | 169   | 557   |
+| First Quartile | 561   | 521   | 366    | 629.5 | 499   | 165   | 372   | 557   |
+| Median         | 657   | 747   | 552    | 817   | 499   | 268   | 459.5 | 557   |
+| Third Quartile | 952   | 821   | 1012.5 | 1199  | 499   | 371   | 599   | 557   |
+| Maximum        | 1192  | 1234  | 1834   | 1530  | 499   | 371   | 843   | 557   |
+
+*To avoid confusion, times are listed in a 24-hour format
+
+Here, we see that early afternoon games typically outperform those that take place during the evening/night. Tracing the medians, we see that on average, 75% of afternoon games outperform all evening/night games, regardless of game date. Therefore, marketing should focus efforts on afternoon games. 
+
+\pagebreak
+
+Lastly, we will be looking at the Total Single-Game Ticket Sales as a factor of Occasion. Recall that a game with no occasion is treated as a regular home game. 
+
+```{r}
+##Boxplot of Single Game Tickets Sold by Occasion
+cols <- rainbow(length(factor(levels(isSpecial))))
+boxplotTTSO <- boxplot(TotalTicketsSold ~ isSpecial, data = MBBGBG, 
+                       main = "Single-Game Tickets Sold by Special Occasions", 
+                       xlab = "Occasion (Y/N)", ylab = "Tickets Sold", 
+                       col = cols, na.action = NULL, notch = TRUE)
+```
+
+Summary Statisics: 
+
+|                | No    | Yes   |
+|----------------|-------|-------|
+| Minimum        | 0     | 255   |
+| First Quartile | 369   | 529   |
+| Median         | 509   | 637.5 |
+| Third Quartile | 658.5 | 843   |
+| Maximum        | 1016  | 1234  |
+
+Here we see that games with Special Occasions tend to outperform their standard counterparts in all areas of Single-Game Ticket Sales. Both groups have roughly the same variability, as well. 
+
+\pagebreak
+
+Separating this into individual occasions, we get the following:
+
+```{r}
+##Boxplot of Single Game Tickets Sold by Occasion
+cols <- rainbow(length(factor(levels(MBBGBG$Occasion))))
+boxplotTTSO <- boxplot(TotalTicketsSold ~ MBBGBG$Occasion, data = MBBGBG, 
+                       main = "Single-Game Tickets Sold by Occasion", 
+                       xlab = "Occasion", ylab = "Tickets Sold", 
+                       col = cols, na.action = NULL)
+```
+
+With summary statistics:
+
+|                |  Home |   HO  |  SD |   WH  |  TfT  |   TT  |   StS  | CO |  BHI  | BRC |
+|:--------------:|:-----:|:-----:|:---:|:-----:|:-----:|:-----:|:------:|:-----------:|:-----:|:---:|
+|     Minimum    |   0   |  255  | 550 |  460  |  380  |  784  |   819  |     320     |  674  | 712 |
+| First Quartile |  369  |  355  | 567 |  599  | 454.5 |  784  |   819  |     320     |  674  | 712 |
+|     Median     |  509  | 488.5 | 608 | 982.5 |  529  | 813.5 | 1005.5 |     382     | 679.5 | 712 |
+| Third Quartile | 658.5 |  635  | 927 |  1234 | 584.5 |  843  |  1192  |     444     |  685  | 712 |
+|     Maximum    |  1016 |  784  | 927 |  1407 |  640  |  843  |  1192  |     444     |  685  | 712 |
+
+**Legend: HO = Home-Opener, SD = Senior Day, WH = Winter Homecoming, TfT = Toys for Tots, TT = Turnpike Trophy, StS = Salute to Service, CO = "Color" Out (Student/Team Spirit Day), BHI = Brooklyn Hoops Invitational, BRC = Banner Raising Ceremony**
+
+In this summary table, we see that the best performing occasion from a sales point-of-view are Home-Openers, Salute to Service, Winter Homecoming, and Senior Day. These occasions consistently outperform other occasions. Therefore, these games should be targets for marketing opportunites. 
+
+\pagebreak
+
+**Section III: Conference Game Breakdowns**
+
+Shifting our focus, we will now look at differences between Conference Games and non-Conference Games. To do so, we will look at the Total Tickets Sold, Total Ticket Revenue, Total Tickets Out for COnference and non-Conference Games. 
+
+```{r, include = F}
+cols <- c("red", "blue")
+```
+
+```{r, out.width = "50%", out.height = "50%"}
+##Boxplot Total Tickets Sold for Conference and Non-Conference Games
+boxplotTTSCG <- boxplot(TotalTicketsSold ~ ConferenceGame, data = MBBGBG, 
+                        main = "Total Tickets Sold by Conference Game", 
+                        xlab = "Conference Game", ylab = "Tickets Sold", 
+                        col = cols, na.action = NULL, notch = TRUE)
+
+##Boxplot of Total Ticket Revenue for Conference and Non-Conference Game
+boxplotTTRCG <- boxplot(TotalTicketRevenue ~ ConferenceGame, data = MBBGBG, 
+                        main = "Total Ticket Revenue by Conference Game", 
+                        xlab = "Conference Game", ylab = "Ticket Revenue", 
+                        col = cols, na.action = NULL, notch = TRUE)
+```
+
+```{r, fig.align = "center", out.width = "50%", out.height = "50%"}
+##Boxplot of Total Tickets Out for Conference and Non-Conference Games
+boxplotTTOCG <- boxplot(TotalTicketsOut ~ ConferenceGame, data = MBBGBG, 
+                        main = "Total Tickets Old by Conference Game", 
+                        xlab = "Conference Game", ylab = "Tickets Out", 
+                        col = cols, na.action = NULL, notch = TRUE)
+```
+
+With these three plots, we can see that the notches for the median for Total Tickets Sold, Total Ticket Revenue, Total Tickets Out, overlaps for Conference and Non-Conference Games. This means that there is **not** enough statistical evidence to support the claim that there is a significant difference for any of these metrics for Conference and Non-Conference Games. Therefore, on average, the Men's Basketball Team sells just as many Total Tickets, earning roughly the same amount of Total Revenue for Non-Conference Games, compared to Conference Games. 
+
+\pagebreak

@@ -1,0 +1,769 @@
+---
+title: "2016-2021 Football Season Ticket and Parking Revenue Report"
+author: "Zachary Lazerick"
+date: 'June 21, 2021'
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+```{r, include = F}
+##Read in the Data
+FBSTRR <- read.csv("2016_2021FBSeasonTicketRevenueReport.csv")
+##Attach for Easy Function Calls
+attach(FBSTRR)
+
+##Recalculated Renewal Rate.
+ReportedRenewalRate <- RenewalRate
+for (i in 1:4) {
+  RenewalRate[i] = RenewedSeasonTicketAccounts[i] / TotalSeasonTicketAccounts[i+1] * 100
+}
+RenewalRate <- round(RenewalRate, digits = 2)
+
+##Difference Between Reported Renewal Rate and Calculated Renewal Rate
+DiffRenewalRate <- (ReportedRenewalRate - RenewalRate)
+
+##Absolute Value of the Difference in Renewal Rates
+AbsDiffRenewalRate <- abs(DiffRenewalRate)
+##Average Difference of Reported Renewal Rate
+mean(AbsDiffRenewalRate)
+##Average Difference of Renewal Rate, not counting 2016
+mean(AbsDiffRenewalRate[1:4])
+```
+
+**Introduction**
+
+In this document, we are analyzing the last six football seasons (2016-2021) in order to measure and quantify the season ticket growth (or lack thereof) and the parking growth (or lack thereof). In doing so, we can examine areas of growth to focus our future efforts, and capitalize on the ongoing growth, as well as areas that are in need of improvement, and should be addressed in order to to continue to grow the Holy Cross Football season Ticket Program. This analysis will be separated into three different sections. First, we will look into the Season Ticket Revenue, then Parking Revenue, and lastly, look at both sources of revenue together. 
+
+**Assumptions and Acknowledgements** 
+
+Before we start, we must acknowledge some limitations to the process of data collection and/or analysis in some or all of the sections below:
+
+First, due to the COVID-19 Pandemic, there was no attendance permitted for the 2020 Football Season, so there were no opportunities for generating revenue. As such, we have omitted it from the study Any graph that includes the 2020 season, should be treated as a hole, meaning, there is no data point for that season. 
+
+Similarly, additional revenue sources like single game ticket and parking sales, revenue earned from concession sales, alcohol sales, merchandise sales were not monitored, and therefore inaccessible for previous seasons and therefore not included. All revenue is calculated solely from Season Ticket and Season Parking Pass Sales.  
+
+Last, all data was obtained from end of season excel revenue reports. Accuracy of this data is predicated on the accuracy of the aforementioned end of season revenue reports. Lastly, since, we only have data as far back as 2016, the 2016 Football Season will be treated as a baseline for all subsequent calculations unless otherwise specified.
+
+\pagebreak
+
+**Section I: Analysis of Season Ticket Revenue**
+
+A brief description of the data we collected is provided below:
+
+Year – Football Season, ex. 2021 –> 2021 Football Season’
+
+Renewed Season Ticket Accounts – The number of season ticket holder accounts from the previous season that renewed their season ticket status
+
+Renewed Season Tickets – The number of season tickets were renewed from the previous season
+
+Renewed Ticket Revenue – The amount of revenue earned from the renewed season tickets (in $)
+
+Reported Renewal Rate – The percentage of previous season ticket holders that decided to renew their season ticket status (in %). This includes transferred accounts. ex. 65.6 –> 65.6%
+
+New Season Ticket Accounts – The number of new season ticket holder accounts who were not season ticket holders the previous season
+
+New Season Tickets – The number of season tickets bought by the new season ticket holder accounts
+
+New Ticket Revenue – The amount of revenue earned from the new season tickets (in $)
+
+Total Season Ticket Accounts – The total number of active season ticket accounts for that season. Calculated as Renewed Season Ticket Accounts + New Season Ticket Accounts
+
+Total Season Tickets – The total number of season tickets renewed or bought. Calculated as Renewed Season Tickets + New Season Tickets
+
+Total Season Ticket Revenue – The total amount of revenue earned from all season ticket purchases. Calculated as Renewed Ticket Revenue + New Ticket Revenue (in $)
+
+Total Parking Revenue – The total amount of revenue earned from the purchase of parking passes across the four parking locations (in $). Calculated as Baseball Parking Revenue + West Lot Parking Revenue + Freshman Field Parking Revenue + Parking Garage Parking Revenue
+
+Total Revenue – The total amount of revenue earned from the purchase of season tickets and parking passes (in $). Calculated as Total Season Ticket Revenue + Total Parking Revenue
+
+\pagebreak
+
+**Part I: Analysis of Season Ticket Holder Accounts, Tickets Sold, and Revenue**
+
+First, we are examining the yearly changes in the number of Season Ticket Holders. 
+
+```{r}
+##Total Number of Season Ticket Accounts Per Year
+plot(Year, TotalSeasonTicketAccounts, type = "l", col = "red", lwd = 3,
+     main = "Total Number of Season Ticket Accounts per Year", 
+     xlab = "Season", ylab = "Season Ticket Accounts")
+```
+
+From our baseline of the 2016 season, each season afterward has outperformed that 2016 season. However, there was a sharp decline in the amount of Season Ticket Holders from the 2018 to the 2019 seasons. There is no easily discernible reason for this decline. Perhaps, fans were excited with the arrival of new head coach Bob Chesney to revitalize the program after very little Patriot League success, only to have a single game improvement in the overall and Patriot League records. However, after winning three-straight conference championships (2019, 2020, 2021), there are more Season Ticket Holders than ever before, with an overall growth of over $131$% from 2016.
+
+\pagebreak
+
+Next, the breakdown of Renewed Season Ticket Accounts vs. New Season Ticket Accounts.
+
+```{r}
+##Renewed vs. New Season Ticket Accounts per Year
+cols <- c("red", "blue")
+par(lwd = 1)
+barplot(t(FBSTRR[c("RenewedSeasonTicketAccounts", "NewSeasonTicketAccounts")]),
+        beside = T, 
+        ylim = c(0, max(FBSTRR[c("RenewedSeasonTicketAccounts", "NewSeasonTicketAccounts")])*1.5),
+        border = cols, col = cols, names.arg = FBSTRR$Year, 
+        main = "Renewed vs. New Season Ticket Accounts per Year",
+        xlab = "Season", ylab = "Number of Accounts")
+box()
+legend("topright", fill = cols, cex = 1,
+       legend = c("Renewed Season Ticket Accounts", "New Season Ticket Accounts"))
+```
+
+Here, we can see that the number of Renewed Season Ticket Accounts is also greater than the number of New Season Ticket Accounts. On average, the number of Renewed Season Ticket Accounts make up around $69$% of the Total Number of Season Ticket Accounts each Year. However, besides a small decline in 2019, the number of New Season Ticket Accounts has been steadily increasing. This means that our Season Ticket Holder Program is growing. More people are signing up for season tickets. This can be attributed to many factors, such as the recent success of the HC Football team, as well as growing class sizes of the student population in recent years. There is no better time than now to capitalize on the sheer number of eyes, both new and old on the HC Football Team. 
+
+\pagebreak
+
+Next in line for the season ticket breakdown is how many season tickets we are selling each year.
+
+```{r}
+##Total Number of Season Tickets Sold per Year
+plot(Year, TotalSeasonTickets, type = "l", col = "red", lwd = 3, 
+     main = "Total Number of Season Tickets Sold per Year", 
+     xlab = "Season", ylab = "Season Tickets Sold")
+```
+
+Here, we see much of the same as what we saw in our "Total Number of Season Ticket Accounts" graph. From our baseline 2016 season, we see that every year after has outperformed our baseline. However, unlike the large decrease in season ticket accounts from 2018 to 2019 that we saw in that graph, in this graph we see that the overall number of Season Tickets sold for those two seasons is only a small dip in number of season tickets sold. This means that the drastic loss of accounts only accounted for a negligible loss of season ticket sales. At the same time, like in that graph, with Patriot League Success, the number of season ticket sales has grown since 2019, and are now higher than ever before, with an overall $165$% increase in total season ticket sales. 
+
+
+\pagebreak
+
+Now for the Renewed Season Tickets vs. New Season Ticket Sales:
+
+```{r}
+##Renewed vs. New Season Tickets Purchased per Year
+cols <- c("red", "blue")
+par(lwd = 1)
+barplot(t(FBSTRR[c("RenewedSeasonTickets", "NewSeasonTickets")]),
+        beside = T, 
+        ylim = c(0, max(FBSTRR[c("RenewedSeasonTickets", "NewSeasonTickets")])*1.5),
+        border = cols, col = cols, names.arg = FBSTRR$Year, 
+        main = "Renewed vs. New Season Tickets Purchased per Year",
+        xlab = "Season", ylab = "Number of Tickets Sold")
+box()
+legend("topright", fill = cols, cex = 1,
+       legend = c("Renewed Season Tickets", "New Season Tickets"))
+```
+
+Like before, we see much of the same in this breakdown as we do in the breakdown of Renewed Season Ticket Accounts versus New Season Ticket Accounts. Naturally, with more Renewed Accounts, there are more opportunities for Renewed Season Tickets to be purchased. Aside from the 2021 Season, Renewed Season Tickets are the clear majority of Total Season Tickets Sold. In the 2021 Season this is a closer 50-50 split, with Renewed Season Tickets being a small majority. On average, Renewed Season Tickets make $67$% of total Season Tickets Sold. Again, aside from the 2021 Season, we can see that the number of Renewed Season Tickets year to year increased from the 2016 Season to the 2019 Season. This means that our Renewed Season Ticket Program was growing for those years. Although, there is a decline in Renewed Season Ticket Sales for the 2021 Season, it still sold the most total tickets, so now is the time to capitalize and get all these customers, both old and new, to renew their season ticket memberships. 
+
+\pagebreak
+
+Next, a breakdown of the Total Revenue Earned from Season Ticket Sales each year. 
+
+```{r}
+##Total Revenue Earned from Season Ticket Sales per Year
+plot(Year, TotalSeasonTicketRevenue, type = "l", col = "red", lwd = 3, 
+     main = "Total Amount of Revenue Earned from Season Tickets", 
+     xlab = "Season", ylab = "Revenue ($)")
+```
+
+Here, we see an increase each year in total season ticket revenue. Unlike in our previous graphs, there is no decline in revenue from the 2018 and 2019 Seasons, where we previously saw declines in both number of season ticket accounts and number of season tickets sold. Unless the audits for these two seasons are inaccurate, this can only mean that the price of the season ticket package increased between these two seasons. We can calculate this increase directly. With $32,337$ dollars in total revenue in 2018, and $701$ total season tickets sold, the cost per season ticket is $46.12$ dollars. Compared to the 2019 season with $38,102$ dollars in total revenue and $695$ total season tickets sold, the cost per season ticket is $54.82$ dollars. Between these two seasons, the price per ticket increased by $119$%. Therefore, this increase in price for season tickets can explain the decline of season ticket accounts. With a greater cost, people are less inclined to renew their season tickets. But, for those who are willing to pay the increased cost, there is potential for more revenue to be earned. 
+
+\pagebreak
+
+To see this more clearly, we can look at a breakdown of Renewed vs. New Season Ticket Revenue:
+
+```{r}
+##Renewed vs. New Season Tickets Revenue per Year
+cols <- c("red", "blue")
+par(lwd = 1)
+barplot(t(FBSTRR[c("RenewedTicketRevenue", "NewTicketRevenue")]),
+        beside = T, 
+        ylim = c(0, max(FBSTRR[c("RenewedTicketRevenue", "NewTicketRevenue")])*1.5),
+        border = cols, col = cols, names.arg = FBSTRR$Year, 
+        main = "Renewed vs. New Season Ticket Revenue per Year",
+        xlab = "Season", ylab = "Revenue ($)")
+box()
+legend("topright", fill = cols, cex = 1,
+       legend = c("Renewed Season Ticket Revenue", "New Season Ticket Revenue"))
+```
+
+Here, like before, Renewed Season Tickets Revenue is greater than New Season Ticket Revenue each year. Renewed Season Tickets Revenue accounts for around $66$% of the Total Season Ticket Revenue. This is in line with our previous Renewed vs. New breakdowns. We also see that aside from a small decline in 2021, the Renewed Season Ticket Revenue has increased year to year. Like from the 2018 to 2019 season, this might be explained by a price increase. But, in selling more tickets, there is also more revenue to be earned. 
+
+\pagebreak
+
+**Part II: The Renewal Rate Fiasco**
+
+Next, we will be looking at the yearly renewal rate. Note: Renewal Rate is calculated as a percentage. 
+
+```{r}
+## Reported Renewal Rate per Year
+plot(Year, ReportedRenewalRate, type = "l", col = "red", lwd = 3, 
+     main = "Reported Renewal Rate per Year", 
+     xlab = "Season", ylab = "Renewal Rate (%)")
+```
+
+Firstly, this graph is not as orderly as any of the previous ones. This graph is all over the place. We see that from our baseline in 2016, two seasons, the 2018 and 2021 season performed worse, and reaching a maximum of $81.4$% in 2019.  
+
+However, when checking for accuracy of numbers, we ran into an issue. Theoretically, the Renewal Rate for any given season is the number of renewed accounts for that season, divided by the number of total season ticket accounts of the previous season. As an example, the Renewal Rate for the 2021 Season should be the Number of Renewed Accounts in 2021, $188$, divided by the Total Number of Season Ticket Accounts the previous season. Since fan attendance was not permitted for the 2020 season due to the COVID-19 Pandemic, the previous season would be the 2019 season, where there were $295$ Total Season Ticket Accounts. Therefore, the 2021 Renewal Rate is $\frac{188}{295} = .637$ or $63.7$%. When calculating the renewal rates this way, none of the calculated rates matched the reported Renewal Rate according the the Revenue Snapshots for each football season.
+
+\pagebreak
+
+Adjusting for this, this is what the calculated yearly renewal rate graph looks like:
+
+```{r}
+##Calculated Renewal Rate per Year
+plot(Year, RenewalRate, type = "l", col = "red", lwd = 3, 
+     main = "Calculated Renewal Rate per Year", 
+     xlab = "Season", ylab = "Renewal Rate (%)")
+```
+
+**Disclaimer: Since we have no record of 2015 season ticket holder information, there is no way to calculate the renewal rate for the 2016 season in the method described on the previous page. Therefore, the reported 2016 renewal rate has to be left as is.**
+
+To start, This is a very different graph than the one above. Here, from our accepted baseline of the 2016 season, our maximum renewal rate is from the 2017 season with a slight decrease the following year. Then afterwards we notice a sharp decrease from the 2018 to 2019 seasons, matching the observation in the decline of total season ticket accounts for these two seasons. From 2019 to 2021, the renewal rate appears mostly constant, hovering around $63$%.
+
+\pagebreak
+
+But, these two graphs have completely different shapes. Not to mention, that the individual points are completely different than what was reported in the Revenue Snapshots. Here is a graph of the difference between the reported renewal rate and the calculated renewal rate:
+
+```{r}
+##Difference of Reported vs. Calculated Renewal Rate per Year
+plot(Year, DiffRenewalRate, type = "l", col = "red", lwd = 3, 
+     main = "Difference Between Reported and Adjusted Renewal Rate per Year", 
+     xlab = "Season", ylab = "Difference (%)")
+```
+
+Recall that the difference of renewal rate is calculated as Reported Renewal Rate minus the adjusted Renewal Rate as calculated by the method described on page 9. Hence, in this graph, a value less than zero, denotes a season where the Reported Renewal Rate is less than the adjusted Renewal Rate. Therefore, these values correspond to seasons where the Renewal Rate was under-reported on the end-of-season Revenue Snapshots. A value greater than zero denotes a season where the Reported Renewal Rate is greater than the adjusted Renewal Rate. Therefore, these values correspond to seasons where the Renewal Rate was over-reported on the end-of-season Revenue Snapshots. 
+
+On average the reported renewal rate differs from the calculated renewal rate by $7.30$%. If we don't include our baseline of 2016 which we have to assume is accurate with the absence of 2015 data, this average difference between the two renewal rates is $9.12$%. This is simply unacceptable.
+
+Why is this? Short answer, without a way of knowing how these reported values were obtained, there is no definite answer on the discrepancy. One might infer there is a significant amount of transferred accounts. In one case, the season ticket status is transferred to an account that is not already a season ticket holder, contributing a net loss of zero to the total number of season ticket accounts. In the other case, the season ticket status is transferred to an account, that is already a season ticket holder, contributing a net loss of one to the total number of season ticket accounts. But, this other case where the net loss of season ticket accounts should not explain a 5-10% difference between these two values, as that would, on average, correspond to over twenty of those transferred accounts per year. 
+
+\pagebreak
+
+A second way to calculate the renewal rate is by examining the percentage of season tickets sold are renewed the following season. This type of renewal rate would be calculated in a similar process to that described on page 9. The Season Ticket Renewal Rate for any given season is the number of renewed season tickets for that season, divided by the number of total season tickets sold the previous season. As an example, the Season Ticket Renewal Rate for the 2021 Season is the Number of Renewed Season Tickets in 2021, $456$, divided by the Total Number of Season Ticket Accounts the previous season. Since fan attendance was not permitted for the 2020 season due to the COVID-19 Pandemic, the previous season would be the 2019 season, where there were $695$ Total Season Tickets sold. Therefore the Season Ticket Renewal Rate for 2021 is $\frac{456}{695} = .656$ or $65.6$%. After calculating the Season Ticket Renewal Rate with this method, we obtain the following graph:
+
+```{r}
+##Season Ticket Renewal Rate
+TicketRenewalRate <- rep(0, 5)
+for (i in 1:4) {
+  TicketRenewalRate[i] = (RenewedSeasonTickets[i] / TotalSeasonTickets[i+1]) * 100
+}
+TicketRenewalRate[5] <- RenewalRate[5]
+TicketRenewalRate <- round(TicketRenewalRate, digits = 2)
+
+##Yearly Season Ticket Renewal Rate
+plot(Year, TicketRenewalRate, type = "l", col = "red", lwd = 3, 
+     main = "Renewal Rate per Year (Season Ticket Sales)", 
+     xlab = "Season", ylab = "Renewal Rate (%)")
+```
+
+**Disclaimer: Since we have no record of 2015 season ticket holder information, there is no way to calculate the renewal rate for the 2016 season in the method described on the previous page. Therefore, the reported 2016 season ticket renewal rate is assumed to be the 2016 reported account renewal rate.**
+
+Comparing our graph for the Season Ticket Renewal Rate and the Account Renewal Rate, we see that both follow a similar pattern. Both graphs start at our assumed baseline for the 2016 season, increases to a maximum in the 2017 season, then decreases for every subsequent season. Although, account renewal rate was low for the 2019 season, the overall season ticket renewal rate stayed mostly the same until the 2021 season where the Season Ticket Renewal Rate hit a minimum. 
+
+A possible explanation for the sharp decline in season ticket renewal rate for the 2021 season may be attributed to the COIVD-19 pandemic. Although there were improvements from the previous year, many of the guidelines and policies put in place to halt the spread of the virus were yet to be rescinded by the start of the 2021 Football Season, and even less so when the Renewal Offers went live. Therefore, fans may have been cautious to renew their season tickets outright, fearing that the season may be canceled again.
+
+\pagebreak
+
+Now, how does the Ticket Renewal Rate compare with the adjusted Account Renewal Rate?
+
+```{r}
+##Difference in Account Renewal Rate and Season Ticket Renewal Rate
+DiffRenewalRate <- RenewalRate - TicketRenewalRate
+plot(Year, DiffRenewalRate, type = "l" , col = "red", lwd = 3, 
+     main = "Difference in Account and Ticket Renewal Rates per Year", 
+     xlab = "Season", ylab = "Difference (%)")
+```
+
+**Disclaimer: Since we have no record of 2015 season ticket holder information, there is no way to calculate the renewal rate for the 2016 season in the method described on the previous page. Therefore, from assumptions made previously, the difference between the account renewal rate and ticket renewal rate is assumed to be 0.**
+
+Here, a value greater than zero means that there was a greater percentage of account renewals than ticket renewals, and a value less than zero means that there was a smaller percentage of account renewals then ticket renewals. 
+
+That being said, aside from the 2017 season, there was a greater percentage of ticket renewals, than account renewals. This means that although accounts might not be getting renewed as frequently, the overall number of renewed season tickets stays roughly the same, from year to year. 
+
+
+
+\pagebreak
+
+```{r, include = F}
+##Read in the Data
+FBPRR <- read.csv("2016_2021FBParkingRevenueReport.csv")
+##Attach for Easier Function Calls
+attach(FBPRR)
+
+##Comp Parking Accounts and Pass Calculations
+CompBaseballParkingAccounts <- TotalBaseballParkingAccounts - PaidBaseballParkingAccounts
+
+CompBaseballParkingPasses <- TotalBaseballParkingPasses - PaidBaseballParkingPasses
+
+CompWestLotParkingAccounts <- TotalWestLotParkingAccounts - PaidWestLotParkingAccounts
+
+CompWestLotParkingPasses <- TotalWestLotParkingPasses - PaidWestLotParkingPasses
+
+CompFreshmanFieldParkingAccounts <- TotalFreshmanFieldParkingAccounts - PaidFreshmanFieldParkingAccounts
+
+CompFreshmanFieldParkingPasses <- TotalFreshmanFieldParkingPasses - PaidFreshmanFieldParkingPasses
+
+CompParkingGarageParkingAccounts <- TotalParkingGarageParkingAccounts - PaidParkingGarageAccounts
+
+CompParkingGarageParkingPasses <- TotalParkingGarageParkingPasses - PaidParkingGarageParkingPasses
+```
+
+
+**Section II: Analysis of Parking Revenue**
+
+A brief description of the data collected is provided below: 
+
+Year - Football Season, ex. 2021 –> 2021 Football Season’
+
+Paid Baseball Parking Accounts – Number of accounts that purchased Baseball Parking. Does not include complimentary pass holders. 
+
+Paid Baseball Parking Passes – Number of passes that were purchased by the Baseball Parking Accounts. Does not include complimentary passes.
+
+Baseball Parking Revenue – The amount of revenue earned by the purchase of the Baseball Parking Passes (in $)
+
+Total Baseball Parking Accounts - The number of accounts that have Baseball Parking. Does include complimentary pass holders. 
+
+Total Baseball Parking Passes - The number of passes that were distributed to the Baseball Parking Accounts. Does include complimentary passes. 
+
+Paid West Lot Accounts – The number of accounts that purchased West Lot Parking. Does not include complimentary pass holders. 
+
+Paid West Lot Parking Passes – The number of passes that were purchased by the West Lot Parking Accounts. Does not include complimentary passes.
+
+West Lot Parking Revenue – The amount of revenue earned by the purchase of the West Lot Parking Passes (in $)
+
+Total West Lot Parking Accounts - The number of accounts that have West Lot Parking. Does include complimentary pass holders. 
+
+Total West Lot Parking Passes - The number of passes that were distributed to the West Lot Parking Accounts. Does include complimentary passes. 
+
+Paid Freshman Field Accounts – The number of accounts that purchased Freshman Field Parking. Does not include complimentary pass holders. 
+
+Paid Freshman Field Parking Passes – The number of passes that were purchased by the Freshman Field Parking Accounts. Does not include complimentary passes. 
+
+Freshman Field Parking Revenue – The amount of revenue earned by the purchase of the Freshman Field Parking Passes (in $)
+
+Total Freshman Field Parking Accounts - The number of accounts that have Freshman Field Parking. Does include complimentary pass holders. 
+
+Total Freshman Field Parking Passes - The numebr of passes that were distributed to the Freshman Field Parking Accounts. Does include complimentary passes.
+
+Paid Parking Garage Accounts – The number of accounts that purchased Parking Garage Parking. Does not include complimentary pass holders. 
+
+Paid Parking Garage Parking Passes – The number of passes that were purchased by the Parking Garage Parking Accounts. Does not include complimentary passes. 
+
+Parking Garage Parking Revenue – The amount of revenue earned from the purchase of the Parking Garage Parking Passes
+
+Total Parking Garage Parking Accounts - The number of accounts that have Parking Garage Parking. Does include complimentary pass holders.
+
+Total Parking Garage Parking Passes - The number of passes that were distributed to the Parking Garage Parking Accounts. Does include complimentary passes. 
+
+Total Paid Parking Accounts – The total number of parking accounts across the four locations. Calculated as Baseball Parking Accounts + West Lot Accounts + Freshman Field Parking Accounts + Parking Garage Accounts. Does not include complimentary pass holders. 
+
+Total Paid Parking Passes – The total number of parking passes purchased across the four locations. Calculated as Baseball Parking Passes + West Lot Parking Passes + Freshman Field Parking Passes + Parking Garage Parking Passes. Does not include complimentary passes. 
+
+Total Parking Revenue – The total amount of revenue earned from the purchase of parking passes across the four parking locations (in $). Calculated as Baseball Parking Revenue + West Lot Parking Revenue + Freshman Field Parking Revenue + Parking Garage Parking Revenue
+
+Total Comp Parking Accounts - The total amount of complimentary parking pass holders. Calculated as the sum of the difference between the number of paid parking accounts and total parking accounts for each individual parking lot. 
+
+Total Comp Parking Passes - The total amount of complimentary parking passes distributed. Calculated as the sum of the difference between the number of paid parking passes and total parking passes for each individual parking lot. 
+
+Total Parking Accounts - The total number of season ticket holder accounts that have a parking pass. Does include comp accounts. Calculated as Total Paid Parking Accounts + Total Comp Parking Accounts. 
+
+Total Parking Passes - The total number of parking passes distributed to season ticket holders. Does include comp passes. Calculated as Total Paid Parking Passes + Total Comp Parking Passes. 
+
+\pagebreak
+
+**Part I: Analysis of Paid Parking Accounts, and Revenue Generated**
+
+As stated previously, the number of parking passes sold for previous seasons for each parking lot are unavailable at this current time, so we will only be examining the Parking Accounts and the Revenue Generated from these Accounts. 
+
+We will begin by looking at the Total Number of Parking Accounts for each season. 
+
+```{r}
+##Total Number of Paid Parking Accounts
+plot(Year, TotalPaidParkingAccounts, type = "l", col = "red", lwd = 3, 
+     main = "Total Number of Paid Parking Accounts", 
+     xlab = "Season", ylab = "Parking Accounts")
+```
+
+Here, we see steady increases in the number of parking accounts year to year. Each year has outperformed the baseline of 2016, showing steady growth in the program. The average year to year percent growth of the program is $107$%, with the total growth of the program in 2021 since 2016 being $182$%. 
+
+\pagebreak
+
+Now, to break down the growth of the program overall to the individual parking lots:
+
+```{r}
+##Baseball vs. West Lot vs. Freshman Field vs. Parking Garage Paid Account Share
+cols <- c("red", "blue", "green", "purple")
+par(lwd = 1)
+barplot(t(FBPRR[c("PaidBaseballParkingAccounts", "PaidWestLotParkingAccounts", 
+                 "PaidFreshmanFieldParkingAccounts", "PaidParkingGarageAccounts")]),
+        beside = T, 
+        ylim = c(0, max(FBPRR[c("PaidBaseballParkingAccounts",
+                                "PaidWestLotParkingAccounts",
+                                "PaidFreshmanFieldParkingAccounts",
+                                "PaidParkingGarageAccounts")])*1.5),
+        border = cols, col = cols, names.arg = FBPRR$Year, 
+        main = "Individual Parking Lot Account Share",
+        xlab = "Season", ylab = "Number of Accounts")
+box()
+legend("topright", fill = cols, cex = .75,
+       legend = c("Baseball Lot", "West Lot", "Freshman Field", "Parking Garage"))
+```
+
+Here, we see that the Baseball Parking holds the majority of the Parking Accounts each year. On average, $63.5$% of Season Ticket Holder Accounts that buy parking, buy parking in the Baseball Lot. Also, notice how there is always a consistent amount of baseball accounts. There are always more than $150$. Given that there are only $250$ available parking spots in the Baseball Lot, it is safe to assume that for these five seasons, the Baseball Lot has either sold out, or come very close. However, definitive proof of this claim is unavailable with the current information at our disposal. 
+
+What are possible reasons for this? One, is the convenience of the Baseball Lot. It is located right next to the Football stadium, and attendees can walk straight into the stadium at game time. Also, there is an entertainment factor. The Baseball Lot allows fans to tailgate. No other parking lot has both of these capabilities. Freshman Field has the ability for fans to tailgate, but in order to get into the stadium, they have to walk halfway around it. The Parking Garage has the convenience of being able to walk straight into the stadium at game time, but with the confined, shared space, there is little ability to tailgate inside of the parking garage. Therefore, the Baseball Lot is the best choice in the eyes of a consumer.
+
+However, there is room for growth. Since the number of accounts that purchase Freshman Field Parking has increased each year, Freshman Field is growing in popularity. One possible way We can capitalize on this growing market is by adding an entrance to the stadium on the Freshman Field Side, eliminating the need for those fans to walk halfway around the stadium to get into the game. This would make the purchase of a Freshman Field Parking pass more enticing to consumers, and level the playing field between the Baseball Lot and Freshman Field. Unfortunately, the same cannot be said for the parking garage, more space cannot simply be added. One way to grow this market could be renting out more spots in the garage, but due to it being a shared space with the rest of campus, would most likely prove difficult. 
+
+\pagebreak
+
+Now to look at the total number of parking passes that were purchased from all the paid parking accounts per season:
+
+```{r}
+##Total Number of Paid Parking Passes Each Season
+plot(Year, TotalPaidParkingPasses, type = "l", col = "red", lwd = 3, 
+     main = "Total Number of Paid Parking Passes", 
+     xlab = "Season", ylab = "Parking Passes")
+```
+
+Here we see that from our baseline in the 2016 season, each subsequent year has outperformed the previous. On average, the total number of paid parking passes grows by $103$%, with an overall growth since 2016 of $188$%. 
+
+\pagebreak
+
+Breaking down the paid parking passes on an individual parking lot basis yields: 
+
+```{r}
+##Baseball vs. West Lot vs. Freshman Field vs. Parking Garage Parking Pass Share
+cols <- c("red", "blue", "green", "purple")
+par(lwd = 1)
+barplot(t(FBPRR[c("PaidBaseballParkingPasses", "PaidWestLotParkingPasses", 
+                 "PaidFreshmanFieldParkingPasses", "PaidParkingGarageParkingPasses")]),
+        beside = T, 
+        ylim = c(0, max(FBPRR[c("PaidBaseballParkingPasses", 
+                                "PaidWestLotParkingPasses",
+                                "PaidFreshmanFieldParkingPasses",
+                                "PaidParkingGarageParkingPasses")])*1.5),
+        border = cols, col = cols, names.arg = FBPRR$Year, 
+        main = "Individual Parking Lot Parking Pass Share",
+        xlab = "Season", ylab = "Number of Parking Passes")
+box()
+legend("topright", fill = cols, cex = .75,
+       legend = c("Baseball Lot", "West Lot", "Freshman Field", "Parking Garage"))
+```
+
+Like with what we saw with the individual parking lot paid account breakdown, we see that the Baseball Parking Lot accounts for a majority of all paid parking passes bought each year. This is to be expected. On average, Baseball Parking Passes account for over $64.2$% of all parking passes purchased each year. As noted before, this can be because the Baseball Parking Lot is the most competitive and sought-after parking lot, due to its convenience and entertainment capabilities.
+
+However, this is not to say that the Baseball Lot is the only worthwhile parking lot. Each year we see increases in the number of parking passes bought for all the other parking lots. We saw a similar trend with the number of paid parking accounts for these lots. This means that while Baseball Lot sells out or comes close to selling out each season, the other parking lots are also being used, and growing at that. Therefore, more resources should be allocated to expand the use of these lots. 
+
+\pagebreak
+
+Now, how much money are we earning from all of the parking passes? Here is a quick look: 
+
+```{r}
+##Total Revenue Earned from Parking Passes
+plot(Year, TotalParkingRevenue, type = "l", col = "red", lwd = 3, 
+     main = "Total Amount of Revenue Earned from Parking Passes", 
+     xlab = "Season", ylab = "Revenue ($)")
+```
+
+Similar to the year to year increase in the number of accounts that purchase parking passes, the overall revenue earned from these passes increases. These two graphs have almost the same shape. The average yearly increase in revenue is over $120$%, with the total growth since 2016 being over $473$%. 
+
+\pagebreak
+
+Breaking down this gigantic increase in revenue in terms of the individual parking lots yields this:
+
+```{r}
+##Baseball vs. West Lot vs. Freshman Field vs. Parking Garage Revenue Share
+cols <- c("red", "blue", "green", "purple")
+par(lwd = 1)
+barplot(t(FBPRR[c("BaseballParkingRevenue", "WestLotParkingRevenue", 
+                 "FreshmanFieldParkingRevenue", "ParkingGarageParkingRevenue")]),
+        beside = T, 
+        ylim = c(0, max(FBPRR[c("BaseballParkingRevenue", "WestLotParkingRevenue", 
+                               "FreshmanFieldParkingRevenue", 
+                               "ParkingGarageParkingRevenue")])*1.5),
+        border = cols, col = cols, names.arg = FBPRR$Year, 
+        main = "Individual Parking Lot Revenue Share",
+        xlab = "Season", ylab = "Revenue ($)")
+box()
+legend("topright", fill = cols, cex = .75,
+       legend = c("Baseball Lot", "West Lot", "Freshman Field", "Parking Garage"))
+```
+
+Like what we saw with breakdown of parking accounts by lot, the Baseball Field dominates the revenue generated. For 2018 and on, this can be chalked up to simply costing more than any other lot. In 2021, Baseball Parking cost over double the price of any other Parking Lot. But, we see similar increases in price for the other lots, but none quite as drastic as that for the Baseball Lot. 
+
+But as we saw with the increasing number of accounts buying passes for all lots, this increase in revenue is not simply due to price increases. More fans are buying parking passes along with their season tickets. On average, $81.8$% of Season Ticket Holders also buy a parking pass, and for the past two seasons, this figure is over $90$%. 
+
+\pagebreak
+
+We can see the amount generated as percentages in the below graph: 
+
+```{r}
+##Baseball vs. West Lot vs. Freshman Field vs. Parking Garage Revenue Share
+##Pie Chart 
+slices <- c(sum(BaseballParkingRevenue), sum(WestLotParkingRevenue), 
+                sum(FreshmanFieldParkingRevenue), sum(ParkingGarageParkingRevenue))
+labels <- c("Baseball", "West Lot", "Freshman Field", "Parking Garage")
+pie(slices, labels = labels, main = "Individual Parking Lot Revenue Share", 
+    col = c("red", "blue", "green", "purple"))
+```
+
+Baseball makes almost $75$% of the total revenue earned from parking passes. To be precise, it accounts for $74.8$% of the total revenue generated from parking passes. As noted previously, this can be simply attributed to the cost of the Baseball Lot compared to the other lots. 
+
+\pagebreak
+
+Not including the revenue earned from the Baseball Lot, the remaining revenue share for the other three parking lots looks like this:
+
+```{r}
+##Revenue Share Minus Baseball Parking
+##Baseball pseudo-outlier, since costs at least 2x the others
+slices <- c(sum(WestLotParkingRevenue), 
+            sum(FreshmanFieldParkingRevenue), sum(ParkingGarageParkingRevenue))
+labels <- c("West Lot", "Freshman Field", "Parking Garage")
+pie(slices, labels = labels, 
+    main = "Remaining Individual Parking Lot Revenue Share", 
+    col = c("blue", "green", "purple"))
+```
+
+Of the remaining quarter of total remaining revenue, the Parking Garage is almost half of it, Freshman Field almost a third, and West Lot the rest. Therefore, Freshman Field and the Parking Garage are next in line to find growth in revenue. Adopting strategies like those mentioned above could bolster further revenue growth. 
+
+\pagebreak
+
+**Part II: Analysis of Complimentary Parking Passes and Lost Revenue**
+
+For transparency of methods, All Complimentary Parking Accounts and Pass numbers are calculated as follows: The number of Comp Parking Accounts is equivalent to the total number of Parking accounts as reported from Audience View, minus those that were paid accounts, as reported by End-of-Year Revenue Snapshots. The number of Comp Parking Passes is equivalent to the total number of Parking Passes as reported from Audience View, minus those that were paid for, as reported by End-of-Year-Revenue Snapshots. 
+
+```{r, include = F}
+CompBaseballParkingAccounts <- TotalBaseballParkingAccounts - PaidBaseballParkingAccounts
+
+CompBaseballParkingPasses <- TotalBaseballParkingPasses - PaidBaseballParkingPasses
+
+CompWestLotParkingAccounts <- TotalWestLotParkingAccounts - PaidWestLotParkingAccounts
+
+CompWestLotParkingPasses <- TotalWestLotParkingPasses - PaidWestLotParkingPasses
+
+CompFreshmanFieldParkingAccounts <- TotalFreshmanFieldParkingAccounts - PaidFreshmanFieldParkingAccounts
+
+CompFreshmanFieldParkingPasses <- TotalFreshmanFieldParkingPasses - PaidFreshmanFieldParkingPasses
+
+CompParkingGarageParkingAccounts <- TotalParkingGarageParkingAccounts - PaidParkingGarageAccounts
+
+CompParkingGarageParkingPasses <- TotalParkingGarageParkingPasses - PaidParkingGarageParkingPasses
+
+##Revenue Lost per Year in Comp Passes
+BaseballRevenueLost <- rep(0, 5)
+BaseballRevenueLost[1] <- 100 * CompBaseballParkingPasses[1] 
+BaseballRevenueLost[2] <- 50 * CompBaseballParkingPasses[2]
+BaseballRevenueLost[3] <- 50 * CompBaseballParkingPasses[3]
+BaseballRevenueLost[4] <- 30 * CompBaseballParkingPasses[4]
+BaseballRevenueLost[5] <- 25 * CompBaseballParkingPasses[5]
+
+WestLotRevenueLost <- rep(0, 5)
+WestLotRevenueLost[1] <- 35 * CompWestLotParkingPasses[1]
+WestLotRevenueLost[2] <- 35 * CompWestLotParkingPasses[2]
+WestLotRevenueLost[3] <- 35 * CompWestLotParkingPasses[3] 
+
+FreshmanFieldRevenueLost <- rep(0, 5)
+FreshmanFieldRevenueLost[1] <- 35 * CompFreshmanFieldParkingPasses[1]
+FreshmanFieldRevenueLost[2] <- 25 * CompFreshmanFieldParkingPasses[2]
+FreshmanFieldRevenueLost[3] <- 25 * CompFreshmanFieldParkingPasses[3]
+FreshmanFieldRevenueLost[4] <- 25 * CompFreshmanFieldParkingPasses[4]
+FreshmanFieldRevenueLost[5] <- 25 * CompFreshmanFieldParkingPasses[5]
+
+ParkingGarageRevenueLost <- rep(0, 5)
+ParkingGarageRevenueLost[1] <- 40 * CompParkingGarageParkingPasses[1]
+ParkingGarageRevenueLost[2] <- 25 * CompParkingGarageParkingPasses[2]
+ParkingGarageRevenueLost[3] <- 25 * CompParkingGarageParkingPasses[3]
+ParkingGarageRevenueLost[4] <- 25 * CompParkingGarageParkingPasses[4]
+ParkingGarageRevenueLost[5] <- 25 * CompParkingGarageParkingPasses[5]
+
+TotalParkingRevenueLost <- rep(0, 5)
+for (i in 1:5) {
+  TotalParkingRevenueLost[i] <- BaseballRevenueLost[i] + WestLotRevenueLost[i] + 
+    FreshmanFieldRevenueLost[i] + ParkingGarageRevenueLost[i]
+}
+
+FBCompRR <- data.frame(Year, CompBaseballParkingAccounts, CompBaseballParkingPasses, 
+                       CompWestLotParkingAccounts, CompWestLotParkingPasses,
+                       CompFreshmanFieldParkingAccounts, CompFreshmanFieldParkingPasses,
+                       CompParkingGarageParkingAccounts, CompParkingGarageParkingPasses, 
+                       BaseballRevenueLost, WestLotRevenueLost, FreshmanFieldRevenueLost,
+                       ParkingGarageRevenueLost, TotalParkingRevenueLost)
+attach(FBCompRR)
+```
+
+First, we are going to look at the number of complimentary parking accounts per Football Season. This is the resulting graph: 
+
+```{r}
+##Total Complimentary Parking Accounts Per Year
+plot(Year, TotalCompParkingAccounts, type = "l", col = "red", lwd = 3, 
+     main = "Total Complimentary Parking Accounts per Season", 
+     xlab = "Season", ylab = "Number of Accounts")
+```
+
+Here, we see that for the for the 2016, 2017, and 2021 Seasons, the total number of complimentary parking accounts has remained fairly low, with under twenty total complimentary parking accounts for each of these seasons. 
+
+However, with the 2018 and 2019 Seasons, there was a huge spike in the total number of complimentary parking accounts. There are no obvious factors that explain why this is. A potential factor may be the 175th anniversary of Holy Cross, so more complimentary game tickets and parking passes were issued for the season.
+
+\pagebreak 
+
+Now to break down the complimentary parking accounts on a individual parking lot basis yields: 
+
+```{r}
+##Baseball vs. West Lot vs. Freshman Field vs. Parking Garage Comp Account Share
+cols <- c("red", "blue", "green", "purple")
+par(lwd = 1)
+barplot(t(FBCompRR[c("CompBaseballParkingAccounts", 
+            "CompWestLotParkingAccounts", 
+            "CompFreshmanFieldParkingAccounts", 
+            "CompParkingGarageParkingAccounts")]),
+        beside = T, 
+        ylim = c(min(FBCompRR[c("CompBaseballParkingAccounts", 
+                                "CompWestLotParkingAccounts", 
+                                "CompFreshmanFieldParkingAccounts", 
+                                "CompParkingGarageParkingAccounts")] * 1.1), 
+                 max(FBCompRR[c("CompBaseballParkingAccounts", 
+                                   "CompWestLotParkingAccounts", 
+                                   "CompFreshmanFieldParkingAccounts", 
+                                   "CompParkingGarageParkingAccounts")] * 1.1)),
+        border = cols, col = cols, names.arg = FBCompRR$Year, 
+        main = "Individual Parking Lot Comp Account Share",
+        xlab = "Season", ylab = "Number of Passes")
+box()
+legend("topright", fill = cols, cex = .75,
+       legend = c("Baseball Lot", "West Lot", "Freshman Field", "Parking Garage"))
+```
+
+The first thing that jumps out on this graph is that the Parking Garage accounts for the majority of all Complimentary Parking Accounts, with the Baseball Lot being the second-highest majority. Like explained before, this may be due to the convenience of the garage's location relative to the Stadium.
+
+But, what is more striking is the negative values for the Parking Garage in 2017 and West Lot in 2021. Recall that the number of complimentary parking accounts is calculated by subtracting the total number of paid parking accounts from the total number of parking accounts for a given lot, for a given season. Therefore, a negative value means that there were more paid parking accounts reported from the end-of-year revenue report, than there were total parking accounts according to Audience View. This is an un-affordable type of error. This means that the number of paid parking accounts is over-reported, or the total number of parking accounts in Audience View is under-reported. A definitive answer is unreachable with our given information, further inquiry is needed. So, the 2017 season, may or may not have had a low number of complimentary parking accounts.
+
+\pagebreak
+
+Now to look at the total number of Complimentary Parking Passes for each Football Season:
+
+```{r}
+##Total Complimentary Parking Passes Per Year
+plot(Year, TotalCompParkingPasses, type = "l", col = "red", lwd = 3, 
+     main = "Total Complimentary Parking Passes per Season", 
+     xlab = "Season", ylab = "Number of Parking Passes")
+```
+
+Here, we see a very similar graph to that of the total number of complimentary parking accounts. It starts and ends with a small number of complimentary passes, but spikes during the 2018 and 2019 seasons. But, we see that the 2017 season had almost 100 total complimentary parking passes, we suggests that the number of paid parking accounts according to the end-of-year Revenue Snapshot was over-reported for that season. But, again, definitive conclusions about this claim are impossible at this time. 
+
+\pagebreak
+
+Breaking the previous graph down in terms of complimentary Parking Passes for each Individual Parking Lot yields the following: 
+
+```{r}
+##Baseball vs. West Lot vs. Freshman Field vs. Parking Garage Comp Parking Passes Share
+cols <- c("red", "blue", "green", "purple")
+par(lwd = 1)
+barplot(t(FBCompRR[c("CompBaseballParkingPasses", 
+            "CompWestLotParkingPasses", 
+            "CompFreshmanFieldParkingPasses", 
+            "CompParkingGarageParkingPasses")]),
+        beside = T, 
+        ylim = c(0, max(FBCompRR[c("CompBaseballParkingPasses", 
+                                   "CompWestLotParkingPasses", 
+                                   "CompFreshmanFieldParkingPasses", 
+                                   "CompParkingGarageParkingPasses")] * 1.5)),
+        border = cols, col = cols, names.arg = FBCompRR$Year, 
+        main = "Individual Parking Lot Comp Parking Passes Share",
+        xlab = "Season", ylab = "Number of Passes")
+box()
+legend("topright", fill = cols, cex = .75,
+       legend = c("Baseball Lot", "West Lot", "Freshman Field", "Parking Garage"))
+```
+
+Here, we see mostly what we saw in the individual parking lot comp parking account breakdown. However, there is one glaring difference. In the comp parking account breakdown, the Freshman Field Lot did not have many comp parking accounts. However, in the comp parking pass breakdown, there is a significant amount of Freshman Field Complimentary Parking Passes for each season. Most of these are simply unaccounted for in terms of matching the number of comp parking passes to the number of comp parking accounts. There is no easy explanation for why this is. Perhaps comp parking passes were handed out without attaching them to an account. This is unacceptable as well. Without proper record of who has a complimentary parking pass, there is nothing that can be done on our end in the event of a lost or damaged parking pass. 
+
+\pagebreak
+
+In giving out complimentary parking passes some potential revenue will be lost. Naturally, this arises from awarding someone a parking space for free, when another paying customer could have bought that parking spot. To estimate this lost revenue, we have investigated parking renewal information for all of the seasons we are investigating, and created a table with the price per parking pass for each parking lot for each season. Below is the table:
+
+| Season | Baseball Lot | West Lot | Freshman Field | Parking Garage |
+|:------:|:------------:|:--------:|:--------------:|:--------------:|
+|  2021  |     $100     |    $35   |       $35      |       $40      |
+|  2019  |      $50     |    $35   |       $25      |       $25      |
+|  2018  |     $50*     |   $35*   |      $25*      |      $25*      |
+|  2017  |     $30*     |    --    |       $25      |       $25      |
+|  2016  |      $25     |    --    |       $25      |       $25      |
+
+**Disclaimer: Numbers with an asterisk represent estimations of price based on number of paid accounts and the revenue earned from them. These may or may not be completely accurate.**
+
+Now, taking our yearly totals of complimentary parking passes issued per parking lot, we can estimate all potential revenue lost. 
+
+\pagebreak
+
+Here is the yearly revenue estimation of Total Revenue Lost:
+
+```{r}
+##Total Parking Revenue Lost from Complimentary Passes
+plot(Year, TotalParkingRevenueLost, type = "l", col = "red", lwd = 3, 
+     main = "Parking Revenue Lost from Complimentary Passes", 
+     xlab = "Season", ylab = "Revenue ($)")
+```
+
+Like with what we saw in the total number of complimentary parking passes awarded to spectators, we see almost the same shape of graph in terms of estimated revenue lost from these complimentary parking passes. The amount of revenue lost starts small in 2016 and 2017, but spikes in 2018 and 2019, before decreasing back down under $2000$ dollars in 2021. 
+
+\pagebreak
+
+If we were to break down the estimated Revenue Lost for each Individual Parking Lot, this is the resulting graph: 
+
+```{r}
+##Total Parking Revenue Lost from Complimentary Passes Individual Lot Breakdown
+cols <- c("red", "blue", "green", "purple")
+par(lwd = 1)
+barplot(t(FBCompRR[c("BaseballRevenueLost", 
+            "WestLotRevenueLost", 
+            "FreshmanFieldRevenueLost", 
+            "ParkingGarageRevenueLost")]),
+        beside = T, 
+        ylim = c(0, max(FBCompRR[c("BaseballRevenueLost", 
+                                   "WestLotRevenueLost", 
+                                   "FreshmanFieldRevenueLost", 
+                                   "ParkingGarageRevenueLost")]) * 1.5),
+        border = cols, col = cols, names.arg = FBCompRR$Year, 
+        main = "Indiviual Parking Lot Comp Parking Revenue Lost",
+        xlab = "Season", ylab = "Revenue ($)")
+box()
+legend("topright", fill = cols, cex = .75,
+       legend = c("Baseball Lot", "West Lot", "Freshman Field", "Parking Garage"))
+```
+
+Much like we saw in the individual parking lot complimentary parking pass breakdown, the parking garage and freshman field appear to be the most guilty. However, in summing all of the estimated revenue lost for each parking lot, we get $5640$ dollars, $2450$ dollars, $5455$ dollars, and $6405$ dollars for the Baseball Lot, West Lot, Freshman Field, and Parking Garage, respectively, for the past six seasons. And a grand total of $19950$ dollars of estimated lost revenue due to complimentary parking passes over those six seasons. 
+
+\pagebreak
+
+**Section III: Total Revenue Analysis**
+
+Finally, breaking down the total revenue earned from these past few seasons: 
+
+```{r}
+##Total Revenue Earned from Season Tickets and Parking Passes
+plot(Year, TotalRevenue, type = "l", col = "red", lwd = 3, 
+     main = "Total Amount of Revenue Earned", 
+     xlab = "Season", ylab = "Revenue ($)")
+```
+
+Like with what we saw with the gradual increases in season ticket revenue and parking revenue, the total revenue earned shows a similar pattern. Overall, the average yearly growth in revenue is over $119$%, with the total revenue growth since 2016 being over $272$%. 
+
+\pagebreak
+
+Breaking this down in terms of Season Ticket Revenue and Parking Pass Revenue Shares, we get the following: 
+
+```{r}
+##Season Tickets vs. Parking Passes Revenue
+cols <- c("red", "blue")
+par(lwd = 1)
+barplot(t(FBSTRR[c("TotalSeasonTicketRevenue", "TotalParkingRevenue")]),
+        beside = T, 
+        ylim = c(0, max(FBSTRR[c("TotalSeasonTicketRevenue", "TotalParkingRevenue")])*1.5),
+        border = cols, col = cols, names.arg = FBSTRR$Year, 
+        main = "Season Tickets vs. Parking Passes Revenue Share per Year",
+        xlab = "Season", ylab = "Revenue ($)")
+box()
+legend("topright", fill = cols, cex = .75,
+       legend = c("Total Season Ticket Revenue", "Total Parking Revenue"))
+```
+
+Overall, season ticket sales account for over $75$% of total revenue earned. This can be explained by large price discrepancies between the two sources of revenue. Without true parking pass data from the seasons before $2021$, we cannot examine the ratio of Season Tickets Sold to Parking Passes Sold. However, going from just the $2021$ season, this ratio is about $2:1$. This means that for every $2$ season tickets sold, we sell $1$ parking pass. Therefore, for the 2021 season, we should expect that season tickets sales account for $\frac{2}{3}$ the total revenue, and parking pass sales the remaining $\frac{1}{3}$. Estimating the total number of parking passes sold for the other seasons, we get ratios of $2.45:1$, $2.51:1$, $2.41:1$, and $2.39:1$ for the $2019$, $2018$, $2017$, and $2016$ seasons, respectively. Converting the ratios to whole numbers, for the other seasons, we see a rough trend of selling about $5$ season tickets for every $2$ parking passes. This supports our previous claim about more parking passes being bought this year than any other year.  
+
+\pagebreak

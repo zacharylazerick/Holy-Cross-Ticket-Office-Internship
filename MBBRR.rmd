@@ -1,0 +1,298 @@
+---
+title: "Men's Basketball Revenue Report"
+author: "Zachary Lazerick"
+date: "June 30, 2022"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+```{r, include = F}
+##Document Setup
+
+##Read in the Data
+MBBRR <- read.csv("2016_2021MBBRR.csv")
+##Attach for Easy Function Calls
+attach(MBBRR)
+##Delete Renewal Rate Column from the Data Set
+OldRenewalRate <- RenewalRate
+AccountRenewalRate <- RenewalRate
+TicketRenewalRate <- RenewalRate
+MBBRR <- MBBRR[, -c(5)]
+```
+
+**Introduction**
+
+In this report, we will be examining the past six Men's Basketball seasons to obtain an understanding about the direction of the program's performance. To do this, we will strictly look at season ticket sales and the revenue from them to determine whether the program is growing or not. In doing so, we will also attempt to find solutions to solve any issues facing the program.
+
+**The Data**
+
+An explanation of all data collected and used in this study is provided below:
+
+Season -- Men's Basketball season, ex. 2021 refers to games from the beginning of November 2021 until end of March 2022.
+
+Season Ticket Accounts Renewed -- The number of Season Ticket Holders that renewed their season tickets from the previous season.
+
+Season Tickets Renewed -- The number of Season Tickets purchased from the renewal of Season Ticket Accounts.
+
+Renewed Ticket Revenue -- The amount of revenue earned from the sale of Renewed Season Tickets. This is measured in USD ($).
+
+New Season Ticket Accounts -- The number of Season Ticket Holders that did not have season tickets the previous season.
+
+New Season Tickets -- The number of Season Tickets purchased from the new Season Ticket Holders.
+
+New Ticket Revenue -- The amount of revenue earned from the sale of New Season Tickets. This is measured in USD ($).
+
+Crusader Combo Accounts -- The number of Season Ticket Holders that purchased Season Tickets for both Men's Basketball and Women's Basketball for a given season.
+
+Crusader Combo Tickets -- The number of Season Tickets purchased from Crusader Combo Account Holders.
+
+Total Season Ticket Accounts -- The number of Renewed and New Season Ticket Holders for a given season. This is calculated as Season Ticket Accounts Renewed + New Season Ticket Accounts.
+
+Total Season Tickets -- The number of Renewed and New Season Tickets purchased for a given season. This is calculated as Season Tickets Renewed + New Season Tickets.
+
+Total Season Ticket Revenue. The amount of revenue earned from the sale of Renewed and New Season Tickets. This is calculated as Renewed Ticket Revenue + New Ticket Revenue. This is measured is USD ($).
+
+\pagebreak
+
+**Section I: Season Ticket Analysis**
+
+As mentioned before, we are analyzing the performance of the Holy Cross Men's Basketball Team strictly by means of season ticket sales. We will do this by breaking down the season ticket sales into three parts, I: Total Season Ticket Metrics, II: Renewal Rate, and III: Crusader Combo Pack Performance. In our Total Season Ticket Metrics analysis, we will specifically look at the year-to-year number of Season Ticket Account Holders, Season Tickets Purchased, and Season Ticket Revenue, further breaking all of these metrics down into whether they are coming from Renewed Season Ticket Members or New Season Ticket Members. In our Renewal Rate analysis, we will calculate the proportion of Season Ticket Accounts and Season Tickets are renewed each year, and use this as a measure of fan satisfaction with the Men's Basketball Program. In our Crusader Combo Pack Analysis, we will analyze fan satisfaction between both Men's Basketball and Women's Basketball. 
+
+**Assumptions and Acknowledgements**
+
+1) Due to the COVID-19 Pandemic, there was an abbreviated 2020 Men's Basketball season. However, fan attendance was not permitted for those games. Hence, all season ticket sales were refunded. Therefore, there is no season ticket data available for this season. As such, this season will not contribute to this report. This means that the 2020 season should be treated as a "hole", meaning no data, in the graph. Thus, the 2020 "data point" in any graph or figure provided below has no interpretability for our purposes.
+
+2) All data used in this report is sourced from end-of-year revenue reports from the Holy Cross ticket office. Accuracy of the conclusions made in this report are predicated on the accuracy of the data provided from said revenue reports.
+
+\pagebreak
+
+**Part I: Total Season Ticket Metrics**
+
+To reiterate, in this section we are examining the year-to-year Totals of Season Ticket Accounts, Season Tickets Sold, and Season Ticket Revenue to determine the direction that the Men's Basketball Program is going in. 
+
+To start, we will be looking at the Total number of Season Ticket Account Holders. Another way to look at this is how many individuals purchased season tickets each season. Below is the resulting graph of this figure:
+
+```{r}
+##Total Season Ticket Accounts each Season
+plot(Season, TotalSeasonTicketAccounts, type = "l", col = "red", lwd = 3, 
+     main = "Total Season Ticket Accounts each Season", 
+     xlab = "Season", ylab = "Accounts")
+```
+
+Here, we see that from the baseline of the 2016 season, the number of Season Ticket Holders has gradually decreased year-to-year. On average, the number of these types of account holders has decreased by around $9.33$% yearly. Overall, since the 2016 season, the number of Season Ticket Holders has decreased by around $33.11$%. This means that over the past six seasons, Men's Basketball has lost almost one-third of its Season Ticket Holders. 
+
+\pagebreak
+
+How does this one-third loss in total Season Ticket Accounts measure in terms of Renewed Season Ticket Accounts and New Season Ticket Accounts? A figure of the number of Renewed Accounts and number of New Accounts for each season is provided below:
+
+```{r}
+##Renewed vs. New Season Ticket Accounts
+cols = c("red", "blue")
+par(lwd = 1)
+barplot(t(MBBRR[c("SeasonTicketAccountsRenewed", "NewSeasonTicketAccounts")]),
+        beside = T, 
+        ylim = c(0, max(MBBRR[c("SeasonTicketAccountsRenewed", 
+                                "NewSeasonTicketAccounts")]) * 1.5), 
+        border = cols, col = cols, names.arg = MBBRR$Season, 
+        main = "Renewed vs. New Season Ticket Accounts each Season", 
+        xlab = "Season", ylab = "Accounts")
+box()
+legend("topright", fill = cols, cex = .75, 
+       legend = c("Renewed Accounts", "New Accounts"))
+```
+
+Here, we see that what is most likely accounting for the one-third loss in total accounts is coming from the overall decrease in Renewed Season Ticket Accounts. On average, the number of Renewed Season Ticket Accounts drops by around $18.30$% year-to-year. As illustrated by the above figure, the opposite is true for New Accounts. The number of New Season Ticket Accounts is steadily increasing. On average, the number of New Season Ticket Accounts increases by around $50.7$% year-to-year. Therefore, this can mean that one of the struggles faced by the Men's Basketball Team is fan retention. We can get the spectators in the door, but cannot make them stay. 
+
+\pagebreak
+
+Next, we are going to examine the Total number of Season Tickets Purchased each Season. Below is the resulting graph:
+
+```{r}
+##Total Season Tickets Purchased each Season
+plot(Season, TotalSeasonTickets, type = "l", col = "red", lwd = 3, 
+     main = "Total Season Ticket Purchased each Season", 
+     xlab = "Season", ylab = "Tickets Purchased")
+```
+
+Here, we see an approximately linear decline of Total Season Tickets Sold each season. From, our baseline of the 2016 season, each subsequent season has sold fewer and fewer Season Tickets. On average, the Total number of Season Tickets Sold decreases by around $10.70$% yearly. Overall, since the 2016 season, the Total number of Season Tickets Sold has decreased by around $36.65$%. This percentage is approximately that of the Total number of Season Ticket Accounts lost since 2016. Therefore, the overall one-third loss of Total Season Ticket Accounts accounted for an approximate loss of one-third of Total Season Ticket Sales.
+
+\pagebreak
+
+In terms of Renewed Season Ticket Sales and New Season Ticket Sales, the one-third overall loss of Total Season Ticket Sales can be illustrated as:
+
+```{r}
+##Renewed vs. New Season Tickets Purchased
+cols = c("red", "blue")
+par(lwd = 1)
+barplot(t(MBBRR[c("SeasonTicketsRenewed", "NewSeasonTickets")]),
+        beside = T, 
+        ylim = c(0, max(MBBRR[c("SeasonTicketsRenewed", "NewSeasonTickets")]) * 1.5), 
+        border = cols, col = cols, names.arg = MBBRR$Season, 
+        main = "Renewed vs. New Season Tickets Purchased each Season", 
+        xlab = "Season", ylab = "Tickets Purchased")
+box()
+legend("topright", fill = cols, cex = .75, 
+       legend = c("Renewed Tickets", "New Tickets"))
+```
+
+Similar to our Renewed Season Ticket Account and New Season Ticket Account breakdown, we see that the overall one-third loss of Total Season Ticket Sales can be attributed to an overall decrease in the number of Renewed Season Ticket Sales. On average, the number of Renewed Season Tickets Sold decreases by around $17.29$% yearly. Again, the opposite is true for New Season Tickets Sold. On average, the number of New Season Tickets Sold increases by $32.76$% yearly. These percentages are approximately those for the Renewed Season Ticket Account yearly decrease and New Season Ticket Account yearly increase. This is to be expected based on our similar findings for the Total Season Tickets Sold. This further reiterates that Fan Retention is a serious issue for the Men's Basketball Team. 
+
+\pagebreak
+
+Now, how has the one-third overall decrease in both the Total number of Season Ticket Accounts and the Total number of Season Tickets Sold effect the Total Season Ticket Revenue? For consistency, we would expect similar decreases in the Total Season Ticket Revenue for these past six seasons. A graph of the yearly Total Season Ticket Revenue is provided below: 
+
+```{r}
+##Total Season Ticket Revenue each Season
+plot(Season, TotalSeasonTicketRevenue, type = "l", col = "red", lwd = 3, 
+     main = "Total Season Ticket Revenue each Season", 
+     xlab = "Season", ylab = "Revenue ($)")
+```
+
+First, unlike the approximately linear decrease we were expecting, we see a curvilinear decrease until the 2019 season, where afterward, we see a linear increase in revenue for the 2021 season. Possible explanations for this are Season Ticket price increases for the from the 2019 to 2021 seasons, since less total season tickets were sold for the 2021 season, and from the 2016 to 2017 seasons for similar reasoning. 
+
+On average, the amount of revenue earned from year-to-year decreases by around $2.54$%, with an overall decrease in Total Season Ticket Revenue of around $10.58$% since the 2016 Season. This means that although around one-third of both the Total Number of Season Ticket Accounts and Total Number of Season Tickets Sold were lost over the past six seasons, only one-tenth of the total revenue earned was lost. This supports the above reasoning of hiding significant losses in Account Holders and Ticket Sales with price increases. However, this strategy is hardly sustainable in the long-term. Without any program success, both in the Patriot League and outside the Patriot League,  to justify an increased ticket price, many fans will simply refuse to pay for season tickets. This strategy may be contributed to the fan retention issue mentioned earlier. 
+
+\pagebreak
+
+Now, how is the one-tenth decrease in Total Season Ticket Revenue broken down between Renewed Season Ticket Revenue and New Season Ticket Revenue? This categorization is illustrated below: 
+
+```{r}
+##Renewed vs. New Season Ticket Revenue
+cols = c("red", "blue")
+par(lwd = 1)
+barplot(t(MBBRR[c("RenewedTicketRevenue", "NewTicketRevenue")]),
+        beside = T, 
+        ylim = c(0, max(MBBRR[c("RenewedTicketRevenue", "NewTicketRevenue")]) * 1.5), 
+        border = cols, col = cols, names.arg = MBBRR$Season, 
+        main = "Renewed vs. New Season Ticket Revenue each Season", 
+        xlab = "Season", ylab = "Revenue ($)")
+box()
+legend("topright", fill = cols, cex = .75, 
+       legend = c("Renewed Revenue", "New Revenue"))
+```
+
+This figure is very similar to the previous Renewed vs New metric breakdowns we've already seen. From this graph, we see that the entirety of revenue loss comes from the yearly decrease in revenue from Renewed Season Tickets Sales. On average, the revenue earned from Renewed Season Ticket sales decreases by around $14.67$% yearly. Again, the opposite is true for New Season Ticket Revenue. On average, the revenue earned from New Season Ticket Sales increases by around $67.22$%. This again, further supports the fan retention claim. New fans are able to come in and enjoy the Men's Basketball Program but are unlikely to stay for an extended period of time, or even renew their season tickets. 
+
+\pagebreak
+
+**Part II: Renewal Rate**
+
+For this part of our report, we will be examining the Yearly Renewal Rate. There are two different ways to interpret the renewal rate for any given season, the Account Renewal Rate, or the Ticket Renewal Rate. Brief descriptions of what these terms mean are provided below:
+
+Account Renewal Rate -- The percentage of Season Ticket Accounts that renewed their season tickets from the previous season. For any given season, this is calculated as Season Ticket Accounts Renewed for that season, divided by the Total Season Ticket Accounts from the previous season. This is measured on a scale from 0 to 100, in terms of %.
+
+Ticket Renewal Rate -- The percentage of Season Tickets that were renewed from the previous season. For any given season, this is calculated as Season Tickets Renewed for that season, divided by the Total Season Tickets from the previous season. This is measured on a scale from 0 to 100, in terms of %.
+
+That being said, the Renewal Rate is a way to measure fan satisfaction with the program. That is, the greater the renewal rate, the greater percentage of fans that want to continue supporting the program by attending games.
+
+First, we will look at the Renewal Rate as according to our data source: the end-of-year revenue reports.
+
+```{r}
+##Reported Renewal Rate
+OldRenewalRate
+```
+
+The renewal rate according to the revenue reports is akin to our Account Renewal Rate. it is a measure of the percentage of accounts that renewed their season ticket status, including transferred accounts. Here, the values for the renewal rate correspond to the 2021, 2019, 2018, 2017, and 2016 seasons, respectively. The first issue we see with this reported data is that there is no reported renewal rate for the 2019 season. There is no obvious explanation for this missing data. The second, and greater, issue is that in investigating the calculations of these numbers with the information provided, the renewal rate we obtained does not match what was reported.
+
+\pagebreak
+
+After recalculating the account renewal rate, this is what was obtained:
+
+```{r}
+##Recalculate Account Renewal Rate
+for (i in 1:4) {
+  AccountRenewalRate[i] <- SeasonTicketAccountsRenewed[i] / TotalSeasonTicketAccounts[i+1]
+  AccountRenewalRate[i] <- AccountRenewalRate[i] * 100
+}
+AccountRenewalRate <- round(AccountRenewalRate, digits = 2)
+
+##Account Renewal Rate
+plot(Season, AccountRenewalRate, type = "l", col = "red", lwd = 3, 
+     main = "Season Ticket Account Renewal Rate each Season", 
+     xlab = "Season", ylab = "Renewal Rate (%)")
+```
+
+**Disclaimer: Since we do not have data from the 2015 season, there is no way to calculate the Account Renewal Rate for the 2016 season from the method described above. Therefore, we have to accept the reported 2016 Account Renewal Rate as provided from the revenue report.**
+
+Here, we see that like our yearly total metrics, the Account Renewal Rate is also in sharp decline. Interpreting this as a measure of fan satisfaction with the program, year-over-year, fans are less and less satisfied with the Men's Basketball Team's performance each season. Since the 2015 season, where the Crusaders made an NCAA Tournament appearance, the Crusaders have come nowhere close to any modicum of success. For the season which we have obtained data for, the Crusaders have posted an overall record of 55-103 and a Patriot League Record of 32-58, none of which were winning seasons, finishing consistently in the bottom half of the Patriot League for all these seasons. With records like these, it is easy to see that fans are not interested in seeing a team consistently lose and not meet expectations.
+
+\pagebreak
+
+After recalculating the Ticket Renewal Rate, this is what was obtained:
+
+```{r}
+##Recalculate Ticket Renewal Rate
+for (i in 1:4) {
+  TicketRenewalRate[i] <- SeasonTicketsRenewed[i] / TotalSeasonTickets[i+1]
+  TicketRenewalRate[i] <- TicketRenewalRate[i] * 100
+}
+TicketRenewalRate <- round(TicketRenewalRate, digits = 2)
+
+##Ticket Renewal Rate
+plot(Season, TicketRenewalRate, type = "l", col = "red", lwd = 3, 
+     main = "Season Ticket Renewal Rate each Season", 
+     xlab = "Season", ylab = "Renewal Rate (%)")
+```
+
+**Disclaimer: Since we do not have data from the 2015 season, there is no way to calculate the Ticket Renewal Rate for the 2016 season from the method described above. Therefore, we have to accept the reported 2016 Account Renewal Rate from the revenue report as an estimation of the 2016 Ticket Renewal Rate.**
+
+Like with the Account Renewal Rate, the Ticket Renewal Rate is also in sharp decline. This makes sense, as the smaller proportion of renewed accounts each year means a smaller proportion of renewed tickets, since those who renew tend not to increase the number of tickets they buy. Both measures of fan satisfaction show almost identical results. Therefore, our fan satisfaction interpretation from the declining percentage of renewing Season Ticket Holders from the previous page is further supported by the declining percentage of Renewed Season Tickets. 
+
+\pagebreak
+
+Now to analyze the difference between the Account and Ticket Renewal Rate, we obtain this graph:
+
+```{r}
+##Difference in Account and Ticket Renewal Rate
+DiffRenewalRate = AccountRenewalRate - TicketRenewalRate
+
+##Difference between Account and Ticket Renewal Rate each Season
+plot(Season, DiffRenewalRate, type = "l", col = "red", lwd = 3, 
+     main = "Difference in Account and Ticket Renewal Rate",
+     xlab = "Season", ylab = "Difference (%)")
+```
+
+**Disclaimer: Since we do not have data from the 2015 season, there is no way to calculate the Account and Ticket Renewal Rate for the 2016 season from the method described above. Therefore, we have to accept the reported 2016 Account Renewal Rate from the revenue report as an estimation of the 2016 Account and Ticket Renewal Rate. Therefore, the difference between the two will be 0 for the 2016 season.**
+
+The difference between the two type of Renewal Rates is calculated as the Account Renewal Rate minus the Ticket Renewal Rate. Therefore, in this figure, a positive value indicates a season with a higher Account Renewal Rate than Ticket Renewal Rate, whereas a negative value indicates a season with a lower Account Renewal Rate than Ticket Renewal Rate. 
+
+Here we see that aside from the 2019 season, there is not a significant difference between the Account Renewal Rate and the Ticket Renewal Rate. For the 2019 season, there was over a 6% greater Ticket Renewal Rate than Account Renewal Rate. This can mean that a significant percentage of the accounts that renewed were those that bought more tickets. However, without further investigation, there is no way to prove this claim. 
+
+\pagebreak
+
+**Part III: Crusader Combo Breakdown**
+
+Finally, we will now measure the yearly number of Accounts and Tickets sold through the 'Crusader Combo' package. To reiterate, this package allows a fan to purchase a season ticket for both the Men's Basketball and Women's Basketball teams. Therefore, the performance of this package is likely correlated to the performance of both the Men's and Women's Basketball teams. 
+
+As we have seen from the overall decline in season ticket accounts and season ticket sales from the Men's Basketball Team, we would expect a similar trend to show in the yearly number of Crusader Combo Accounts and Crusader Combo Tickets. 
+
+First, in this breakdown, we will look at the yearly number of Crusader Combo Accounts. A graph of this metric is provided below:
+
+```{r}
+##Crusader Combo Accounts each Season
+plot(Season, CrusaderComboAccounts, type = "l", col = "red", lwd = 3, 
+     main = "Crusader Combo Accounts each Season", 
+     xlab = "Season", ylab = "Accounts")
+```
+
+Here, we see roughly what we were expecting. Aside from a small increase from the 2017 to the 2018 seasons, we see a steady decline in the number of Crusader Combo Accounts. On average, there is around a $15.58$% decrease in the number of Crusader Combo Accounts each season, with an overall decrease of around $52.38$% in this metric since the 2016 season. This means that we have lost around half of the individual fans interested in purchasing Season Tickets since the 2016 season. These two figures are greater than those calculated for the yearly average decrease in Total Season Ticket Accounts and overall decrease in Total Season Ticket Accounts from Part I. This means, that there may be a fan retention and/or fan satisfaction issue with both the Men's Basketball and Women's Basketball teams. If it was just a fan retention and/or fan satisfaction issue with just the Men's Basketball Team we would expect roughly the same yearly and overall decreases in these metrics, not an approximate $50$% increase in both of these metrics. However, in order to prove this claim, further investigation is required. 
+
+\pagebreak
+
+Focusing now to the yearly number of Season Tickets Purchased through the Crusader Combo Accounts, we see the following:
+
+```{r}
+##Crusader Combo Tickets Purchased each Season
+plot(Season, CrusaderComboTickets, type = "l", col = "red", lwd = 3, 
+     main = "Crusader Combo Tickets Purchased each Season", 
+     xlab = "Season", ylab = "Tickets Purchased")
+```
+
+Like with what we saw from the yearly decline in Crusader Combo Accounts, we see a steady, yearly decline in the number of Crusader Combo Tickets sold. This is to be expected because, with fewer Crusader Combo Accounts each season, there are less opportunities to sell these types of Season Tickets. 
+
+On average, the number of Crusader Combo Tickets decreases by around $16.46$% each season, with an overall decrease of around $53.25$% in Crusader Combo Ticket sales since 2016. This means that we are selling around half as many tickets now as we did six seasons ago. Like what we saw with Total Season Tickets sold and Total Season Ticket Accounts, the one-half loss in Crusader Combo Tickets sold can be explained by the one-half loss in Crusader Combo Accounts. 
+
+\pagebreak
